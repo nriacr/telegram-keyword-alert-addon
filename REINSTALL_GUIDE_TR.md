@@ -1,127 +1,56 @@
 # Telegram Keyword Alert Yeniden Kurulum Kilavuzu
 
-Bu kilavuz, Home Assistant OS'i yeniden kurduktan sonra `Telegram Keyword Alert` add-on'unu tekrar ayaga kaldirmak icin hazirlandi.
+Bu kilavuz, Home Assistant OS'i yeniden kurduktan sonra `Telegram Keyword Alert` add-on'unu en hizli sekilde tekrar kurmak icin hazirlandi.
 
-## 1. Gerekli Dosyalar
+## 1. En Hizli Kurulum Yontemi
 
-Yeni kurulumdan sonra Home Assistant cihazinda su klasor yapisi olmalidir:
+Bu repo artik Home Assistant'a dogrudan repository URL olarak eklenebilir.
 
-- `/addons/local/telegram_keyword_alert/config.json`
-- `/addons/local/telegram_keyword_alert/Dockerfile`
-- `/addons/local/telegram_keyword_alert/run.sh`
-- `/addons/local/telegram_keyword_alert/app.py`
-
-Bu dosyalar repo ana klasorunde bulunur:
-
-- `config.json`
-- `Dockerfile`
-- `run.sh`
-- `app.py`
-
-## 1.1 Klasoru Nasil Kopyalayacaksin
-
-GitHub repo icindeki dosyalari dogrudan Home Assistant'ta su hedef klasore koyacaksin:
-
-- `telegram_keyword_alert`
-
-Yani en guvenli yontem su:
-
-1. Home Assistant cihazinda su klasoru olustur:
-
-```sh
-mkdir -p /addons/local/telegram_keyword_alert
-```
-
-2. GitHub repo ana klasorundeki `config.json`, `Dockerfile`, `run.sh` ve `app.py` dosyalarini alip, Home Assistant'taki `telegram_keyword_alert` klasorunun icine koy.
-
-Son durum su olmali:
-
-- `/addons/local/telegram_keyword_alert/config.json`
-- `/addons/local/telegram_keyword_alert/Dockerfile`
-- `/addons/local/telegram_keyword_alert/run.sh`
-- `/addons/local/telegram_keyword_alert/app.py`
-
-Onemli:
-
-- Home Assistant tarafinda klasor adini farkli yapma
-- `slug` ile uyumlu olmasi icin hedef klasor adi `telegram_keyword_alert` olmali
-
-## 2. Home Assistant Icinde Klasoru Hazirla
-
-1. Home Assistant'i kur.
-2. `SSH & Web Terminal` eklentisini kur ve ac.
-3. Terminalde su komutu calistir:
-
-```sh
-mkdir -p /addons/local/telegram_keyword_alert
-```
-
-4. GitHub repo ana klasorunden `config.json`, `Dockerfile`, `run.sh` ve `app.py` dosyalarini alip bu klasore koy.
-
-## 2.1 GitHub Kullanacaksan
-
-Bu projede repo yapisi su sekilde tutulur:
+Kullanacagin URL:
 
 ```text
-telegram-keyword-alert-addon/
+https://github.com/nriacr/telegram-keyword-alert-addon
+```
+
+Bu yontemde Home Assistant uzerinde klasor olusturman gerekmez.
+
+## 2. Home Assistant'ta GitHub URL ile Kurulum
+
+1. Home Assistant'i kur.
+2. `Ayarlar` > `Eklentiler` bolumune gir.
+3. `Add-on Store` ekranini ac.
+4. Sag ustteki 3 nokta menuye bas.
+5. `Repositories` secenegini ac.
+6. Su URL'yi ekle:
+
+```text
+https://github.com/nriacr/telegram-keyword-alert-addon
+```
+
+7. Kaydet.
+8. Add-on listesini yenile.
+9. `Telegram Keyword Alert` eklentisini ac.
+10. `Install` / `Yukle` dugmesine bas.
+
+## 2.1 Bu Yontemde GitHub'da Ne Var
+
+Home Assistant'in repository olarak okuyacagi yapi repo icinde hazir:
+
+```text
+repository.yaml
+telegram_keyword_alert/
   config.json
   Dockerfile
   run.sh
   app.py
-  README.md
-  REINSTALL_GUIDE_TR.md
-  CONFIG_TEMPLATE.md
 ```
 
-Yeniden kurulumda GitHub'dan alirken yapacagin sey:
-
-1. GitHub repo'nu ac.
-2. Repo icindeki su dosyalari indir:
-   - `config.json`
-   - `Dockerfile`
-   - `run.sh`
-   - `app.py`
-3. Home Assistant cihazinda su klasoru olustur:
-
-```sh
-mkdir -p /addons/local/telegram_keyword_alert
-```
-
-4. Indirdigin bu 4 dosyayi Home Assistant'ta su klasorun icine koy:
-
-```text
-/addons/local/telegram_keyword_alert
-```
-
-5. Gerekirse repo'daki `REINSTALL_GUIDE_TR.md` ve `CONFIG_TEMPLATE.md` dosyalarini da referans olarak sakla.
-
-Kisa ozet:
-
-- GitHub'da dosyalar repo ana klasorunde durur
-- Home Assistant'ta ise ayni dosyalar mutlaka `/addons/local/telegram_keyword_alert` altinda olmali
-
-## 2.2 Home Assistant Add-on Uzerinden Kolay GitHub Geri Kurulum
-
-En kolay geri kurulum yontemi genelde `SSH & Web Terminal` eklentisiyle dosyalari yerlestirmektir.
-
-1. Home Assistant'ta `SSH & Web Terminal` eklentisini kur.
-2. Eklentiyi ac.
-3. `/addons/local/telegram_keyword_alert` klasorunu olustur.
-4. GitHub repo'ndaki 4 ana dosyayi bu klasore kopyala.
-5. Home Assistant'ta `Reload` yap.
-6. `Telegram Keyword Alert` add-on'unu `Install` et.
-
-Not:
-
-- Bu repo'yu Home Assistant'in add-on listesine harici repo olarak eklemiyorsun
-- Buradaki mantik, repo'yu yedek olarak tutup add-on dosyalarini `/addons/local/telegram_keyword_alert` altina geri koymak
+Yani yeniden kurulumda senin dosya tasimana gerek yok.
 
 ## 3. Add-on'u Home Assistant'a Goster
 
-1. Home Assistant arayuzunde `Ayarlar` > `Eklentiler` bolumune gir.
-2. Sag ustten `Reload` / `Yeniden Yukle` yap.
-3. Listede `Telegram Keyword Alert` gorunmeli.
-4. Eklentiyi ac ve `Install` / `Yukle` dugmesine bas.
+1. Repository URL'yi ekledikten sonra add-on listesinde `Telegram Keyword Alert` gorunmeli.
+2. Eklentiyi ac ve `Install` / `Yukle` dugmesine bas.
 
 ## 4. Ilk Konfigurasyon
 
