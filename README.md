@@ -2,21 +2,47 @@
 
 Home Assistant OS uzerinde calisan, Telegram kanallarini dinleyip belirlenen keyword'ler gecince Pushover bildirimi gonderen custom add-on.
 
-## Dosyalar
+## Repo Yapisi
 
-- `config.json`: Add-on tanimi ve ayar semasi
-- `Dockerfile`: Add-on image yapisi
-- `run.sh`: Baslatma komutu
-- `app.py`: Telegram dinleme ve Pushover bildirimi
+Bu repo ana klasorunde su dosyalar bulunur:
 
-## Kurulum
+- `config.json`
+- `Dockerfile`
+- `run.sh`
+- `app.py`
+- `README.md`
+- `REINSTALL_GUIDE_TR.md`
+- `CONFIG_TEMPLATE.md`
 
-1. Bu klasoru Home Assistant cihazinda `/addons/local/telegram_keyword_alert` altina kopyala.
-2. Home Assistant icinde Add-ons sayfasinda `Reload` yap.
-3. `Telegram Keyword Alert` eklentisini ac.
-4. `api_id`, `api_hash`, `phone_number`, `pushover_user_key`, `pushover_api_token` alanlarini doldur.
-5. `keywords` alanina aramak istedigin kelimeleri ekle.
-6. Ilk giriste `verification_code` alanini gecici olarak kullan.
+## Home Assistant'ta Nereye Konur
+
+Repo'daki add-on dosyalari Home Assistant cihazinda su klasore konur:
+
+```text
+/addons/local/telegram_keyword_alert
+```
+
+Son gorunum su olmali:
+
+- `/addons/local/telegram_keyword_alert/config.json`
+- `/addons/local/telegram_keyword_alert/Dockerfile`
+- `/addons/local/telegram_keyword_alert/run.sh`
+- `/addons/local/telegram_keyword_alert/app.py`
+
+## Kurulum Ozeti
+
+1. Bu repo'daki `config.json`, `Dockerfile`, `run.sh` ve `app.py` dosyalarini al.
+2. Home Assistant cihazinda `/addons/local/telegram_keyword_alert` klasorunu olustur.
+3. Bu 4 dosyayi bu klasorun icine koy.
+4. Home Assistant icinde `Add-ons` sayfasinda `Reload` yap.
+5. `Telegram Keyword Alert` eklentisini ac ve `Install` et.
+6. `api_id`, `api_hash`, `phone_number`, `pushover_user_key`, `pushover_api_token`, `channels`, `keywords` alanlarini doldur.
+7. Ilk giriste `verification_code` alanini gecici olarak kullan.
+
+## Belgeler
+
+- Ayrintili yeniden kurulum kilavuzu: `REINSTALL_GUIDE_TR.md`
+- Hizli ayar ozeti: `CONFIG_TEMPLATE.md`
 
 ## Notlar
 
