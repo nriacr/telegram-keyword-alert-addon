@@ -2,42 +2,42 @@
 
 Home Assistant OS uzerinde calisan, Telegram kanallarini dinleyip belirlenen keyword'ler gecince Pushover bildirimi gonderen custom add-on.
 
-## Repo Yapisi
+## Kolay Kurulum
 
-Bu repo ana klasorunde su dosyalar bulunur:
+Bu repo, Home Assistant'a dogrudan repository URL olarak eklenebilecek sekilde hazirlandi.
 
-- `config.json`
-- `Dockerfile`
-- `run.sh`
-- `app.py`
-- `README.md`
-- `REINSTALL_GUIDE_TR.md`
-- `CONFIG_TEMPLATE.md`
-
-## Home Assistant'ta Nereye Konur
-
-Repo'daki add-on dosyalari Home Assistant cihazinda su klasore konur:
+Kullanacagin URL:
 
 ```text
-/addons/local/telegram_keyword_alert
+https://github.com/nriacr/telegram-keyword-alert-addon
 ```
 
-Son gorunum su olmali:
+## Home Assistant Icinde Kurulum
 
-- `/addons/local/telegram_keyword_alert/config.json`
-- `/addons/local/telegram_keyword_alert/Dockerfile`
-- `/addons/local/telegram_keyword_alert/run.sh`
-- `/addons/local/telegram_keyword_alert/app.py`
+1. `Ayarlar` > `Eklentiler` sayfasina gir.
+2. `Add-on Store` ekranini ac.
+3. Sag ustteki 3 nokta menuden `Repositories` sec.
+4. Su URL'yi ekle:
 
-## Kurulum Ozeti
+```text
+https://github.com/nriacr/telegram-keyword-alert-addon
+```
 
-1. Bu repo'daki `config.json`, `Dockerfile`, `run.sh` ve `app.py` dosyalarini al.
-2. Home Assistant cihazinda `/addons/local/telegram_keyword_alert` klasorunu olustur.
-3. Bu 4 dosyayi bu klasorun icine koy.
-4. Home Assistant icinde `Add-ons` sayfasinda `Reload` yap.
-5. `Telegram Keyword Alert` eklentisini ac ve `Install` et.
-6. `api_id`, `api_hash`, `phone_number`, `pushover_user_key`, `pushover_api_token`, `channels`, `keywords` alanlarini doldur.
-7. Ilk giriste `verification_code` alanini gecici olarak kullan.
+5. Kaydet.
+6. Add-on listesinde `Telegram Keyword Alert` gorunecek.
+7. Eklentiyi ac ve `Install` et.
+8. `api_id`, `api_hash`, `phone_number`, `pushover_user_key`, `pushover_api_token`, `channels`, `keywords` alanlarini doldur.
+9. Ilk giriste `verification_code` alanini gecici olarak kullan.
+
+## Repo Yapisi
+
+Home Assistant'in repository olarak okuyacagi dosyalar:
+
+- `repository.yaml`
+- `telegram_keyword_alert/config.json`
+- `telegram_keyword_alert/Dockerfile`
+- `telegram_keyword_alert/run.sh`
+- `telegram_keyword_alert/app.py`
 
 ## Belgeler
 
