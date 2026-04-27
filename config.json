@@ -1,0 +1,46 @@
+{
+  "name": "Telegram Keyword Alert",
+  "version": "0.2.0",
+  "slug": "telegram_keyword_alert",
+  "description": "Listens Telegram channels and sends Pushover alerts for matching keywords.",
+  "startup": "services",
+  "boot": "auto",
+  "arch": ["aarch64", "armv7", "armhf"],
+  "init": false,
+  "options": {
+    "api_id": "",
+    "api_hash": "",
+    "phone_number": "",
+    "verification_code": "",
+    "session_name": "telegram_keyword_alert",
+    "channels": [
+      "@yaniyocom",
+      "@firsatz",
+      "@onual_firsat",
+      "@onual_ekstra",
+      "@butcedostu",
+      "@depoindirim",
+      "@uygunfiyatdedektifi",
+      "@tasarrufluharca",
+      "@depourunleri",
+      "@evEkonomi",
+      "@firsatavi"
+    ],
+    "keywords": [],
+    "exclude_keywords": [],
+    "pushover_user_key": "",
+    "pushover_api_token": ""
+  },
+  "schema": {
+    "api_id": "str",
+    "api_hash": "str",
+    "phone_number": "str",
+    "verification_code": "str",
+    "session_name": "str",
+    "channels": ["str"],
+    "keywords": ["str"],
+    "exclude_keywords": ["str"],
+    "pushover_user_key": "str",
+    "pushover_api_token": "str"
+  }
+}
