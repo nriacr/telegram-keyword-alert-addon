@@ -52,33 +52,24 @@ yorum yap
 
 ## Kurulum Sirasi
 
-1. GitHub repo'daki `config.json`, `Dockerfile`, `run.sh` ve `app.py` dosyalarini al.
-2. Bu dosyalari `/addons/local/telegram_keyword_alert` altina koy.
-3. Home Assistant tarafindaki hedef klasor adini `telegram_keyword_alert` yap.
-4. Home Assistant'ta `Reload` yap.
-5. Add-on'u `Install` et.
-6. Alanlari doldur ve `Save` de.
-7. `Start` et.
-8. Telegram'dan gelen kodu `verification_code` alanina gir.
-9. `Restart` et.
-10. Basarili giristen sonra `verification_code` alanini temizle.
+1. `Ayarlar` > `Eklentiler` > `Add-on Store` ekranina gir.
+2. Sag ustteki 3 nokta menuden `Repositories` sec.
+3. Su URL'yi ekle: `https://github.com/nriacr/telegram-keyword-alert-addon`
+4. `Telegram Keyword Alert` eklentisini bulup `Install` et.
+5. Alanlari doldur ve `Save` de.
+6. `Start` et.
+7. Telegram'dan gelen kodu `verification_code` alanina gir.
+8. `Restart` et.
+9. Basarili giristen sonra `verification_code` alanini temizle.
 
 ## GitHub Yerlesimi
 
-GitHub repo kullanacaksan, dosyalari repo ana klasorunde tut:
+Home Assistant repository olarak okunacak yapi:
 
 ```text
-config.json
-Dockerfile
-run.sh
-app.py
-README.md
-REINSTALL_GUIDE_TR.md
-CONFIG_TEMPLATE.md
-```
-
-Ama Home Assistant tarafinda bu dosyalar mutlaka su klasore yerlestirilmeli:
-
-```text
-/addons/local/telegram_keyword_alert
+repository.yaml
+telegram_keyword_alert/config.json
+telegram_keyword_alert/Dockerfile
+telegram_keyword_alert/run.sh
+telegram_keyword_alert/app.py
 ```
