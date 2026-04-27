@@ -1,0 +1,218 @@
+import asyncio
+import json
+import os
+
+import requests
+from telethon import TelegramClient, events
+from telethon.errors import SessionPasswordNeededError
+
+CONFIG_PATH = "/data/options.json"
+SESSION_PATH = "/data/telegram_keyword_alert"
+STATE_PATH = "/data/login_state.json"
+SEEN_PATH = "/data/seen_messages.json"
+
+
+def load_config():
+    with open(CONFIG_PATH, "r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def load_json_file(path, default_value):
+    if not os.path.exists(path):
+        return default_value
+    with open(path, "r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def save_json_file(path, data):
+    with open(path, "w", encoding="utf-8") as file:
+        json.dump(data, file)
+
+
+async def wait_forever(message):
+    while True:
+        print(message)
+        await asyncio.sleep(60)
+
+
+def normalize_text(value):
+    return (value or "").strip().lower()
+
+
+def message_matches(text, keywords, exclude_keywords):
+    normalized = normalize_text(text)
+
+    if not normalized:
+        return False, None
+
+    for exclude_keyword in exclude_keywords:
+        if normalize_text(exclude_keyword) in normalized:
+            return False, None
+
+    for keyword in keywords:
+        normalized_keyword = normalize_text(keyword)
+        if normalized_keyword and normalized_keyword in normalized:
+            return True, keyword
+
+    return False, None
+
+
+def send_pushover(user_key, api_token, title, message, url=""):
+    payload = {
+        "token": api_token,
+        "user": user_key,
+        "title": title,
+        "message": message[:1024],
+    }
+
+    if url:
+        payload["url"] = url
+        payload["url_title"] = "Telegram'da ac"
+
+    response = requests.post(
+        "https://api.pushover.net/1/messages.json",
+        data=payload,
+        timeout=15,
+    )
+    response.raise_for_status()
+
+
+async def main():
+    print("Telegram Keyword Alert add-on basladi.")
+
+    try:
+        config = load_config()
+        print("Yapilandirma dosyasi okundu.")
+    except Exception as error:
+        print(f"Yapilandirma okunamadi: {error}")
+        await wait_forever("Yapilandirma duzeltmesi bekleniyor...")
+        return
+
+    api_id = config.get("api_id")
+    api_hash = config.get("api_hash")
+    phone_number = config.get("phone_number")
+    verification_code = config.get("verification_code", "").strip()
+    channels = config.get("channels", [])
+    keywords = config.get("keywords", [])
+    exclude_keywords = config.get("exclude_keywords", [])
+    pushover_user_key = config.get("pushover_user_key", "").strip()
+    pushover_api_token = config.get("pushover_api_token", "").strip()
+
+    if not api_id or not api_hash or not phone_number:
+        print("api_id, api_hash veya phone_number eksik.")
+        await wait_forever("Eksik ayar tamamlanmasi bekleniyor...")
+        return
+
+    if not pushover_user_key or not pushover_api_token:
+        print("Pushover ayarlari eksik.")
+        await wait_forever("Pushover ayarlari bekleniyor...")
+        return
+
+    print("Telegram baglantisi baslatiliyor...")
+
+    client = TelegramClient(SESSION_PATH, int(api_id), api_hash)
+    await client.connect()
+
+    if not await client.is_user_authorized():
+        state = load_json_file(STATE_PATH, {})
+
+        if not verification_code:
+            print("Telegram girisi gerekiyor. Telefona bir kod gelecek.")
+            result = await client.send_code_request(phone_number)
+            state["phone_code_hash"] = result.phone_code_hash
+            save_json_file(STATE_PATH, state)
+            print("Kod gonderildi. Home Assistant ayarlarinda verification_code alanina kodu yaz.")
+            await wait_forever("Dogrulama kodu bekleniyor...")
+            return
+
+        phone_code_hash = state.get("phone_code_hash")
+        if not phone_code_hash:
+            print("phone_code_hash bulunamadi. verification_code alanini bosaltip tekrar kod isteyelim.")
+            await wait_forever("Dogrulama bilgisi bekleniyor...")
+            return
+
+        try:
+            await client.sign_in(
+                phone=phone_number,
+                code=verification_code,
+                phone_code_hash=phone_code_hash,
+            )
+            print("Kod ile giris basarili.")
+        except SessionPasswordNeededError:
+            print("Iki adimli dogrulama sifresi gerekiyor. Bunu sonraki adimda ekleyecegiz.")
+            await wait_forever("2FA sifresi bekleniyor...")
+            return
+        except Exception as error:
+            print(f"Giris hatasi: {error}")
+            await wait_forever("Giris duzeltmesi bekleniyor...")
+            return
+
+    me = await client.get_me()
+    print(f"Giris yapildi: {me.first_name}")
+    print(f"Kanal sayisi: {len(channels)}")
+    print(f"Keyword sayisi: {len(keywords)}")
+
+    if not channels:
+        print("Izlenecek kanal yok.")
+        await wait_forever("Kanal listesi bekleniyor...")
+        return
+
+    if not keywords:
+        print("Keyword listesi bos.")
+        await wait_forever("Keyword listesi bekleniyor...")
+        return
+
+    seen_messages = set(load_json_file(SEEN_PATH, []))
+
+    @client.on(events.NewMessage(chats=channels))
+    async def handle_new_message(event):
+        try:
+            message_text = event.raw_text or ""
+            matched, matched_keyword = message_matches(
+                message_text,
+                keywords,
+                exclude_keywords,
+            )
+
+            if not matched:
+                return
+
+            message_key = f"{event.chat_id}:{event.id}"
+            if message_key in seen_messages:
+                return
+
+            seen_messages.add(message_key)
+            save_json_file(SEEN_PATH, list(seen_messages))
+
+            chat = await event.get_chat()
+            channel_name = getattr(chat, "title", None) or getattr(chat, "username", None) or "Telegram"
+
+            message_link = ""
+            username = getattr(chat, "username", None)
+            if username:
+                message_link = f"https://t.me/{username}/{event.id}"
+
+            short_text = message_text.replace("\n", " ").strip()
+            if len(short_text) > 300:
+                short_text = short_text[:300] + "..."
+
+            title = f"Firsat alarmi: {matched_keyword}"
+            body = f"Kanal: {channel_name}\n\n{short_text}"
+
+            send_pushover(
+                pushover_user_key,
+                pushover_api_token,
+                title,
+                body,
+                message_link,
+            )
+
+            print(f"Bildirim gonderildi. Kanal: {channel_name} Keyword: {matched_keyword}")
+        except Exception as error:
+            print(f"Mesaj isleme hatasi: {error}")
+
+    print("Kanal dinleme basladi.")
+    await client.run_until_disconnected()
+
+
+asyncio.run(main())
