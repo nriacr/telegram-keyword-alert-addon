@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+from datetime import datetime
 
 import requests
 from telethon import TelegramClient, events
@@ -10,6 +11,11 @@ CONFIG_PATH = "/data/options.json"
 SESSION_PATH = "/data/telegram_keyword_alert"
 STATE_PATH = "/data/login_state.json"
 SEEN_PATH = "/data/seen_messages.json"
+
+
+def log(message):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{timestamp}] {message}")
 
 
 def load_config():
@@ -31,7 +37,7 @@ def save_json_file(path, data):
 
 async def wait_forever(message):
     while True:
-        print(message)
+        log(message)
         await asyncio.sleep(60)
 
 
@@ -78,13 +84,13 @@ def send_pushover(user_key, api_token, title, message, url=""):
 
 
 async def main():
-    print("Telegram Keyword Alert add-on basladi.")
+    log("Telegram Keyword Alert add-on basladi.")
 
     try:
         config = load_config()
-        print("Yapilandirma dosyasi okundu.")
+        log("Yapilandirma dosyasi okundu.")
     except Exception as error:
-        print(f"Yapilandirma okunamadi: {error}")
+        log(f"Yapilandirma okunamadi: {error}")
         await wait_forever("Yapilandirma duzeltmesi bekleniyor...")
         return
 
@@ -99,16 +105,16 @@ async def main():
     pushover_api_token = config.get("pushover_api_token", "").strip()
 
     if not api_id or not api_hash or not phone_number:
-        print("api_id, api_hash veya phone_number eksik.")
+        log("api_id, api_hash veya phone_number eksik.")
         await wait_forever("Eksik ayar tamamlanmasi bekleniyor...")
         return
 
     if not pushover_user_key or not pushover_api_token:
-        print("Pushover ayarlari eksik.")
+        log("Pushover ayarlari eksik.")
         await wait_forever("Pushover ayarlari bekleniyor...")
         return
 
-    print("Telegram baglantisi baslatiliyor...")
+    log("Telegram baglantisi baslatiliyor...")
 
     client = TelegramClient(SESSION_PATH, int(api_id), api_hash)
     await client.connect()
@@ -117,17 +123,17 @@ async def main():
         state = load_json_file(STATE_PATH, {})
 
         if not verification_code:
-            print("Telegram girisi gerekiyor. Telefona bir kod gelecek.")
+            log("Telegram girisi gerekiyor. Telefona bir kod gelecek.")
             result = await client.send_code_request(phone_number)
             state["phone_code_hash"] = result.phone_code_hash
             save_json_file(STATE_PATH, state)
-            print("Kod gonderildi. Home Assistant ayarlarinda verification_code alanina kodu yaz.")
+            log("Kod gonderildi. Home Assistant ayarlarinda verification_code alanina kodu yaz.")
             await wait_forever("Dogrulama kodu bekleniyor...")
             return
 
         phone_code_hash = state.get("phone_code_hash")
         if not phone_code_hash:
-            print("phone_code_hash bulunamadi. verification_code alanini bosaltip tekrar kod isteyelim.")
+            log("phone_code_hash bulunamadi. verification_code alanini bosaltip tekrar kod isteyelim.")
             await wait_forever("Dogrulama bilgisi bekleniyor...")
             return
 
@@ -137,28 +143,28 @@ async def main():
                 code=verification_code,
                 phone_code_hash=phone_code_hash,
             )
-            print("Kod ile giris basarili.")
+            log("Kod ile giris basarili.")
         except SessionPasswordNeededError:
-            print("Iki adimli dogrulama sifresi gerekiyor. Bunu sonraki adimda ekleyecegiz.")
+            log("Iki adimli dogrulama sifresi gerekiyor. Bunu sonraki adimda ekleyecegiz.")
             await wait_forever("2FA sifresi bekleniyor...")
             return
         except Exception as error:
-            print(f"Giris hatasi: {error}")
+            log(f"Giris hatasi: {error}")
             await wait_forever("Giris duzeltmesi bekleniyor...")
             return
 
     me = await client.get_me()
-    print(f"Giris yapildi: {me.first_name}")
-    print(f"Kanal sayisi: {len(channels)}")
-    print(f"Keyword sayisi: {len(keywords)}")
+    log(f"Giris yapildi: {me.first_name}")
+    log(f"Kanal sayisi: {len(channels)}")
+    log(f"Keyword sayisi: {len(keywords)}")
 
     if not channels:
-        print("Izlenecek kanal yok.")
+        log("Izlenecek kanal yok.")
         await wait_forever("Kanal listesi bekleniyor...")
         return
 
     if not keywords:
-        print("Keyword listesi bos.")
+        log("Keyword listesi bos.")
         await wait_forever("Keyword listesi bekleniyor...")
         return
 
@@ -207,11 +213,11 @@ async def main():
                 message_link,
             )
 
-            print(f"Bildirim gonderildi. Kanal: {channel_name} Keyword: {matched_keyword}")
+            log(f"Bildirim gonderildi. Kanal: {channel_name} Keyword: {matched_keyword}")
         except Exception as error:
-            print(f"Mesaj isleme hatasi: {error}")
+            log(f"Mesaj isleme hatasi: {error}")
 
-    print("Kanal dinleme basladi.")
+    log("Kanal dinleme basladi.")
     await client.run_until_disconnected()
 
 
