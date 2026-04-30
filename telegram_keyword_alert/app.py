@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import re
 from datetime import datetime
 
 import requests
@@ -11,6 +12,8 @@ CONFIG_PATH = "/data/options.json"
 SESSION_PATH = "/data/telegram_keyword_alert"
 STATE_PATH = "/data/login_state.json"
 SEEN_PATH = "/data/seen_messages.json"
+SEEN_DEALS_PATH = "/data/seen_deals.json"
+PRICE_REGEX = re.compile(r"((?:\d{1,3}(?:[.,]\d{3})+|\d+)(?:[.,]\d{1,2})?)\s*(?:TL|₺)", re.IGNORECASE)
 
 
 def log(message):
@@ -43,6 +46,42 @@ async def wait_forever(message):
 
 def normalize_text(value):
     return (value or "").strip().lower()
+
+
+def normalize_price(value):
+    raw = (value or "").strip()
+    if not raw:
+        return None
+
+    if "." in raw and "," in raw:
+        normalized = raw.replace(".", "").replace(",", ".")
+    elif "," in raw:
+        left, right = raw.rsplit(",", 1)
+        normalized = raw.replace(",", ".") if len(right) == 2 else raw.replace(",", "")
+    elif "." in raw:
+        left, right = raw.rsplit(".", 1)
+        normalized = raw if len(right) == 2 else raw.replace(".", "")
+    else:
+        normalized = raw
+
+    return normalized
+
+
+def extract_price(text):
+    match = PRICE_REGEX.search(text or "")
+    if not match:
+        return None
+    return normalize_price(match.group(1))
+
+
+def build_daily_deal_key(keyword, price):
+    if not keyword or not price:
+        return None
+    return f"{normalize_text(keyword)}|{price}"
+
+
+def prune_seen_deals(seen_deals, today_key):
+    return {key: value for key, value in seen_deals.items() if value == today_key}
 
 
 def message_matches(text, keywords, exclude_keywords):
@@ -169,6 +208,9 @@ async def main():
         return
 
     seen_messages = set(load_json_file(SEEN_PATH, []))
+    today_key = datetime.now().strftime("%Y-%m-%d")
+    seen_deals = prune_seen_deals(load_json_file(SEEN_DEALS_PATH, {}), today_key)
+    save_json_file(SEEN_DEALS_PATH, seen_deals)
 
     @client.on(events.NewMessage(chats=channels))
     async def handle_new_message(event):
@@ -185,6 +227,16 @@ async def main():
 
             message_key = f"{event.chat_id}:{event.id}"
             if message_key in seen_messages:
+                return
+
+            price = extract_price(message_text)
+            deal_key = build_daily_deal_key(matched_keyword, price)
+            current_day = datetime.now().strftime("%Y-%m-%d")
+
+            if deal_key and seen_deals.get(deal_key) == current_day:
+                log(f"Ayni gun icinde ayni fiyatli firsat susturuldu. Keyword: {matched_keyword} Fiyat: {price}")
+                seen_messages.add(message_key)
+                save_json_file(SEEN_PATH, list(seen_messages))
                 return
 
             seen_messages.add(message_key)
@@ -213,7 +265,11 @@ async def main():
                 message_link,
             )
 
-            log(f"Bildirim gonderildi. Kanal: {channel_name} Keyword: {matched_keyword}")
+            if deal_key:
+                seen_deals[deal_key] = current_day
+                save_json_file(SEEN_DEALS_PATH, seen_deals)
+
+            log(f"Bildirim gonderildi. Kanal: {channel_name} Keyword: {matched_keyword} Fiyat: {price or 'yok'}")
         except Exception as error:
             log(f"Mesaj isleme hatasi: {error}")
 
