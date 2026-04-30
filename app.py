@@ -14,6 +14,7 @@ STATE_PATH = "/data/login_state.json"
 SEEN_PATH = "/data/seen_messages.json"
 SEEN_DEALS_PATH = "/data/seen_deals.json"
 PRICE_REGEX = re.compile(r"((?:\d{1,3}(?:[.,]\d{3})+|\d+)(?:[.,]\d{1,2})?)\s*(?:TL|₺)", re.IGNORECASE)
+HEARTBEAT_INTERVAL_SECONDS = 3600
 
 
 def log(message):
@@ -42,6 +43,12 @@ async def wait_forever(message):
     while True:
         log(message)
         await asyncio.sleep(60)
+
+
+async def heartbeat_loop():
+    while True:
+        await asyncio.sleep(HEARTBEAT_INTERVAL_SECONDS)
+        log("Kanal dinleme devam ediyor. Heartbeat logu.")
 
 
 def normalize_text(value):
@@ -274,6 +281,7 @@ async def main():
             log(f"Mesaj isleme hatasi: {error}")
 
     log("Kanal dinleme basladi.")
+    asyncio.create_task(heartbeat_loop())
     await client.run_until_disconnected()
 
 
