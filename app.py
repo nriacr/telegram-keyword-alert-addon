@@ -48,7 +48,7 @@ async def wait_forever(message):
 async def heartbeat_loop():
     while True:
         await asyncio.sleep(HEARTBEAT_INTERVAL_SECONDS)
-        log("Kanal dinleme devam ediyor. Heartbeat logu.")
+        log("Kanal dinleme devam ediyor.")
 
 
 def normalize_text(value):
@@ -179,7 +179,7 @@ async def main():
 
         phone_code_hash = state.get("phone_code_hash")
         if not phone_code_hash:
-            log("phone_code_hash bulunamadi. verification_code alanini bosaltip tekrar kod isteyelim.")
+            log("phone_code_hash bulunamadi. verification_code alanini bosaltip tekrar kod isteleyelim.")
             await wait_forever("Dogrulama bilgisi bekleniyor...")
             return
 
