@@ -48,7 +48,7 @@ async def wait_forever(message):
 async def heartbeat_loop():
     while True:
         await asyncio.sleep(HEARTBEAT_INTERVAL_SECONDS)
-        log("Kanal dinleme devam ediyor.")
+        log("Kanal dinleme devam ediyor. Heartbeat logu.")
 
 
 def normalize_text(value):
