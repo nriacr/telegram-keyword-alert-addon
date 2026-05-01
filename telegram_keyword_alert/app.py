@@ -217,6 +217,7 @@ async def main():
     seen_messages = set(load_json_file(SEEN_PATH, []))
     today_key = datetime.now().strftime("%Y-%m-%d")
     seen_deals = prune_seen_deals(load_json_file(SEEN_DEALS_PATH, {}), today_key)
+    seen_deals_lock = asyncio.Lock()
     save_json_file(SEEN_DEALS_PATH, seen_deals)
 
     @client.on(events.NewMessage(chats=channels))
@@ -233,21 +234,26 @@ async def main():
                 return
 
             message_key = f"{event.chat_id}:{event.id}"
-            if message_key in seen_messages:
-                return
-
             price = extract_price(message_text)
             deal_key = build_daily_deal_key(matched_keyword, price)
             current_day = datetime.now().strftime("%Y-%m-%d")
 
-            if deal_key and seen_deals.get(deal_key) == current_day:
-                log(f"Ayni gun icinde ayni fiyatli firsat susturuldu. Keyword: {matched_keyword} Fiyat: {price}")
+            async with seen_deals_lock:
+                if message_key in seen_messages:
+                    return
+
+                if deal_key and seen_deals.get(deal_key) == current_day:
+                    log(f"Ayni gun icinde ayni fiyatli firsat susturuldu. Keyword: {matched_keyword} Fiyat: {price}")
+                    seen_messages.add(message_key)
+                    save_json_file(SEEN_PATH, list(seen_messages))
+                    return
+
                 seen_messages.add(message_key)
                 save_json_file(SEEN_PATH, list(seen_messages))
-                return
 
-            seen_messages.add(message_key)
-            save_json_file(SEEN_PATH, list(seen_messages))
+                if deal_key:
+                    seen_deals[deal_key] = current_day
+                    save_json_file(SEEN_DEALS_PATH, seen_deals)
 
             chat = await event.get_chat()
             channel_name = getattr(chat, "title", None) or getattr(chat, "username", None) or "Telegram"
@@ -271,10 +277,6 @@ async def main():
                 body,
                 message_link,
             )
-
-            if deal_key:
-                seen_deals[deal_key] = current_day
-                save_json_file(SEEN_DEALS_PATH, seen_deals)
 
             log(f"Bildirim gonderildi. Kanal: {channel_name} Keyword: {matched_keyword} Fiyat: {price or 'yok'}")
         except Exception as error:
