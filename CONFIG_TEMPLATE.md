@@ -1,24 +1,24 @@
 # Configuration Template
 
-Home Assistant add-on ayar ekranina girerken kullanman icin kisa bir referans.
+Home Assistant add-on ayar ekranına girerken kullanman için kısa bir referans.
 
 ## Doldurulacak Alanlar
 
 ### Telegram
 
-- `api_id`: `my.telegram.org` uzerinden alinir
-- `api_hash`: `my.telegram.org` uzerinden alinir
+- `api_id`: `my.telegram.org` üzerinden alınır
+- `api_hash`: `my.telegram.org` üzerinden alınır
 - `phone_number`: `+905xxxxxxxxx`
-- `verification_code`: sadece ilk giriste gecici olarak kullan
+- `verification_code`: sadece ilk girişte geçici olarak kullan
 
 ### Pushover
 
-- `pushover_user_key`: Pushover hesabindaki `Your User Key`
-- `pushover_api_token`: olusturdugun uygulamanin `API Token/Key`
+- `pushover_user_key`: Pushover hesabındaki `Your User Key`
+- `pushover_api_token`: oluşturduğun uygulamanın `API Token/Key`
 
 ### Kanallar
 
-Su listeyi istersen dogrudan yeniden gir:
+Şu listeyi istersen doğrudan yeniden gir:
 
 ```text
 @yaniyocom
@@ -34,7 +34,7 @@ Su listeyi istersen dogrudan yeniden gir:
 @firsatavi
 ```
 
-### Keyword Ornegi
+### Keyword Örneği
 
 ```text
 iphone 16
@@ -43,35 +43,39 @@ dyson
 ps5
 ```
 
-### Exclude Keyword Ornegi
+### Exclude Keyword Örneği
 
 ```text
-cekilis
+çekiliş
 yorum yap
 ```
 
-## Kurulum Sirasi
+## Kurulum Sırası
 
-1. `Ayarlar` > `Eklentiler` > `Add-on Store` ekranina gir.
-2. Sag ustteki 3 nokta menuden `Repositories` sec.
-3. Su URL'yi ekle: `https://github.com/nriacr/telegram-keyword-alert-addon`
+1. `Ayarlar` > `Eklentiler` > `Add-on Store` ekranına gir.
+2. Sağ üstteki üç nokta menüden `Repositories` seç.
+3. Şu URL'yi ekle: `https://github.com/nriacr/telegram-keyword-alert-addon`
 4. `Telegram Keyword Alert` eklentisini bulup `Install` et.
-5. Alanlari doldur ve `Save` de.
+5. Alanları doldur ve `Save` de.
 6. `Start` et.
-7. Telegram'dan gelen kodu `verification_code` alanina gir.
+7. Telegram'dan gelen kodu `verification_code` alanına gir.
 8. `Restart` et.
-9. Basarili giristen sonra `verification_code` alanini temizle.
-10. Istersen add-on sayfasinda `Show in sidebar` secenegini ac.
+9. Başarılı girişten sonra `verification_code` alanını temizle.
+10. İstersen add-on sayfasında `Show in sidebar` seçeneğini aç.
 
-## Kenar Cubugu
+## Kenar Çubuğu
 
-`Show in sidebar` acildiginda sol menude `Telegram Alert` gorunur. Bu ekranda calisma durumu, kanal sayisi, keyword sayisi, son kontrol, bildirim sayisi, susturulan tekrarlar ve hata sayisi gorunur.
+`Show in sidebar` açıldığında sol menüde `Telegram Alert` görünür. Bu ekranda çalışma durumu, kanal sayısı, keyword sayısı, son kontrol, bildirim sayısı, susturulan tekrarlar ve hata sayısı görünür.
 
-Hata sayisi yalnizca son 24 saati kapsar. 24 saatten eski hata kayitlari otomatik temizlenir.
+Hata sayısı yalnızca son 24 saati kapsar. 24 saatten eski hata kayıtları otomatik temizlenir.
 
-## GitHub Yerlesimi
+## Versiyonlama
 
-Home Assistant repository olarak okunacak yapi:
+Bundan sonra sürümler `2.0`, `2.1`, `2.2` formatında ilerler.
+
+## GitHub Yerleşimi
+
+Home Assistant repository olarak okunacak yapı:
 
 ```text
 repository.yaml
