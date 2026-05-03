@@ -1,48 +1,52 @@
 # Telegram Keyword Alert Add-on
 
-Home Assistant OS uzerinde calisan, Telegram kanallarini dinleyip belirlenen keyword'ler gecince Pushover bildirimi gonderen custom add-on.
+Home Assistant OS üzerinde çalışan, Telegram kanallarını dinleyip belirlenen keyword'ler geçince Pushover bildirimi gönderen custom add-on.
 
 ## Kolay Kurulum
 
-Bu repo, Home Assistant'a dogrudan repository URL olarak eklenebilecek sekilde hazirlandi.
+Bu repo, Home Assistant'a doğrudan repository URL olarak eklenebilecek şekilde hazırlandı.
 
-Kullanacagin URL:
+Kullanacağın URL:
 
 ```text
 https://github.com/nriacr/telegram-keyword-alert-addon
 ```
 
-## Home Assistant Icinde Kurulum
+## Home Assistant İçinde Kurulum
 
-1. `Ayarlar` > `Eklentiler` sayfasina gir.
-2. `Add-on Store` ekranini ac.
-3. Sag ustteki 3 nokta menuden `Repositories` sec.
-4. Su URL'yi ekle:
+1. `Ayarlar` > `Eklentiler` sayfasına gir.
+2. `Add-on Store` ekranını aç.
+3. Sağ üstteki üç nokta menüden `Repositories` seç.
+4. Şu URL'yi ekle:
 
 ```text
 https://github.com/nriacr/telegram-keyword-alert-addon
 ```
 
 5. Kaydet.
-6. Add-on listesinde `Telegram Keyword Alert` gorunecek.
-7. Eklentiyi ac ve `Install` et.
-8. `api_id`, `api_hash`, `phone_number`, `pushover_user_key`, `pushover_api_token`, `channels`, `keywords` alanlarini doldur.
-9. Ilk giriste `verification_code` alanini gecici olarak kullan.
+6. Add-on listesinde `Telegram Keyword Alert` görünecek.
+7. Eklentiyi aç ve `Install` et.
+8. `api_id`, `api_hash`, `phone_number`, `pushover_user_key`, `pushover_api_token`, `channels`, `keywords` alanlarını doldur.
+9. İlk girişte `verification_code` alanını geçici olarak kullan.
 
-## Kenar Cubugu Arayuzu
+## Kenar Çubuğu Arayüzü
 
-Surum `1.1.0` ile add-on icinde Home Assistant kenar cubugu icin durum ekrani eklendi.
+Sürüm `2.0` ile kenar çubuğu arayüzü daha küçük ölçekli hale getirildi, Türkçe metinler düzeltildi ve `Kayıtları Aç` / `Add-on Sayfasını Aç` butonları add-on kimliğini otomatik bulacak şekilde güncellendi.
 
 1. Add-on'u `Start` et.
-2. Add-on sayfasinda `Show in sidebar` secenegini ac.
-3. Sol menude `Telegram Alert` gorunur.
-4. Bu ekranda calisma durumu, kanal sayisi, keyword sayisi, son kontrol, bildirim sayisi, susturulan tekrarlar ve hata sayisi gorunur.
+2. Add-on sayfasında `Show in sidebar` seçeneğini aç.
+3. Sol menüde `Telegram Alert` görünür.
+4. Bu ekranda çalışma durumu, kanal sayısı, keyword sayısı, son kontrol, bildirim sayısı, susturulan tekrarlar ve hata sayısı görünür.
 
-Hata sayisi yalnizca son 24 saati kapsar. 24 saatten eski hata kayitlari otomatik temizlenir.
+Hata sayısı yalnızca son 24 saati kapsar. 24 saatten eski hata kayıtları otomatik temizlenir.
 
-## Repo Yapisi
+## Versiyonlama
 
-Home Assistant'in repository olarak okuyacagi dosyalar:
+Bundan sonra sürümler `2.0`, `2.1`, `2.2` formatında ilerler.
+
+## Repo Yapısı
+
+Home Assistant'ın repository olarak okuyacağı dosyalar:
 
 - `repository.yaml`
 - `telegram_keyword_alert/config.json`
@@ -52,12 +56,12 @@ Home Assistant'in repository olarak okuyacagi dosyalar:
 
 ## Belgeler
 
-- Ayrintili yeniden kurulum kilavuzu: `REINSTALL_GUIDE_TR.md`
-- Hizli ayar ozeti: `CONFIG_TEMPLATE.md`
+- Ayrıntılı yeniden kurulum kılavuzu: `REINSTALL_GUIDE_TR.md`
+- Hızlı ayar özeti: `CONFIG_TEMPLATE.md`
 
 ## Notlar
 
-- `verification_code` giris tamamlandiktan sonra bos birakilabilir.
-- `keywords` ve `exclude_keywords` listeleri Home Assistant arayuzunden yonetilir.
-- `seen_messages.json` ayni mesaja tekrar bildirim gitmesini engeller.
-- `seen_deals.json` ayni gun icinde ayni keyword ve ayni fiyat icin tekrar bildirim gitmesini engeller.
+- `verification_code` giriş tamamlandıktan sonra boş bırakılabilir.
+- `keywords` ve `exclude_keywords` listeleri Home Assistant arayüzünden yönetilir.
+- `seen_messages.json` aynı mesaja tekrar bildirim gitmesini engeller.
+- `seen_deals.json` aynı gün içinde aynı keyword ve aynı fiyat için tekrar bildirim gitmesini engeller.
