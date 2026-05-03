@@ -29,6 +29,17 @@ https://github.com/nriacr/telegram-keyword-alert-addon
 8. `api_id`, `api_hash`, `phone_number`, `pushover_user_key`, `pushover_api_token`, `channels`, `keywords` alanlarini doldur.
 9. Ilk giriste `verification_code` alanini gecici olarak kullan.
 
+## Kenar Cubugu Arayuzu
+
+Surum `1.1.0` ile add-on icinde Home Assistant kenar cubugu icin durum ekrani eklendi.
+
+1. Add-on'u `Start` et.
+2. Add-on sayfasinda `Show in sidebar` secenegini ac.
+3. Sol menude `Telegram Alert` gorunur.
+4. Bu ekranda calisma durumu, kanal sayisi, keyword sayisi, son kontrol, bildirim sayisi, susturulan tekrarlar ve hata sayisi gorunur.
+
+Hata sayisi yalnizca son 24 saati kapsar. 24 saatten eski hata kayitlari otomatik temizlenir.
+
 ## Repo Yapisi
 
 Home Assistant'in repository olarak okuyacagi dosyalar:
@@ -49,3 +60,4 @@ Home Assistant'in repository olarak okuyacagi dosyalar:
 - `verification_code` giris tamamlandiktan sonra bos birakilabilir.
 - `keywords` ve `exclude_keywords` listeleri Home Assistant arayuzunden yonetilir.
 - `seen_messages.json` ayni mesaja tekrar bildirim gitmesini engeller.
+- `seen_deals.json` ayni gun icinde ayni keyword ve ayni fiyat icin tekrar bildirim gitmesini engeller.
