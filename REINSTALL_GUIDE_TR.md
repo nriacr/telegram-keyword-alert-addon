@@ -1,27 +1,27 @@
-# Telegram Keyword Alert Yeniden Kurulum Kilavuzu
+# Telegram Keyword Alert Yeniden Kurulum Kılavuzu
 
-Bu kilavuz, Home Assistant OS'i yeniden kurduktan sonra `Telegram Keyword Alert` add-on'unu en hizli sekilde tekrar kurmak icin hazirlandi.
+Bu kılavuz, Home Assistant OS'i yeniden kurduktan sonra `Telegram Keyword Alert` add-on'unu en hızlı şekilde tekrar kurmak için hazırlandı.
 
-## 1. En Hizli Kurulum Yontemi
+## 1. En Hızlı Kurulum Yöntemi
 
-Bu repo artik Home Assistant'a dogrudan repository URL olarak eklenebilir.
+Bu repo Home Assistant'a doğrudan repository URL olarak eklenebilir.
 
-Kullanacagin URL:
+Kullanacağın URL:
 
 ```text
 https://github.com/nriacr/telegram-keyword-alert-addon
 ```
 
-Bu yontemde Home Assistant uzerinde klasor olusturman gerekmez.
+Bu yöntemde Home Assistant üzerinde klasör oluşturman gerekmez.
 
 ## 2. Home Assistant'ta GitHub URL ile Kurulum
 
-1. Home Assistant'i kur.
-2. `Ayarlar` > `Eklentiler` bolumune gir.
-3. `Add-on Store` ekranini ac.
-4. Sag ustteki 3 nokta menuye bas.
-5. `Repositories` secenegini ac.
-6. Su URL'yi ekle:
+1. Home Assistant'ı kur.
+2. `Ayarlar` > `Eklentiler` bölümüne gir.
+3. `Add-on Store` ekranını aç.
+4. Sağ üstteki üç nokta menüye bas.
+5. `Repositories` seçeneğini aç.
+6. Şu URL'yi ekle:
 
 ```text
 https://github.com/nriacr/telegram-keyword-alert-addon
@@ -29,12 +29,12 @@ https://github.com/nriacr/telegram-keyword-alert-addon
 
 7. Kaydet.
 8. Add-on listesini yenile.
-9. `Telegram Keyword Alert` eklentisini ac.
-10. `Install` / `Yukle` dugmesine bas.
+9. `Telegram Keyword Alert` eklentisini aç.
+10. `Install` / `Yükle` düğmesine bas.
 
-## 2.1 Bu Yontemde GitHub'da Ne Var
+## 2.1 Bu Yöntemde GitHub'da Ne Var
 
-Home Assistant'in repository olarak okuyacagi yapi repo icinde hazir:
+Home Assistant'ın repository olarak okuyacağı yapı repo içinde hazır:
 
 ```text
 repository.yaml
@@ -45,16 +45,16 @@ telegram_keyword_alert/
   app.py
 ```
 
-Yani yeniden kurulumda senin dosya tasimana gerek yok.
+Yani yeniden kurulumda senin dosya taşıman gerekmez.
 
-## 3. Add-on'u Home Assistant'a Goster
+## 3. Add-on'u Home Assistant'a Göster
 
-1. Repository URL'yi ekledikten sonra add-on listesinde `Telegram Keyword Alert` gorunmeli.
-2. Eklentiyi ac ve `Install` / `Yukle` dugmesine bas.
+1. Repository URL'yi ekledikten sonra add-on listesinde `Telegram Keyword Alert` görünmeli.
+2. Eklentiyi aç ve `Install` / `Yükle` düğmesine bas.
 
-## 4. Ilk Konfigurasyon
+## 4. İlk Konfigürasyon
 
-`Configuration` / `Yapilandirma` ekraninda su alanlari doldur:
+`Configuration` / `Yapılandırma` ekranında şu alanları doldur:
 
 - `api_id`
 - `api_hash`
@@ -63,46 +63,46 @@ Yani yeniden kurulumda senin dosya tasimana gerek yok.
 - `pushover_api_token`
 - `channels`
 - `keywords`
-- `exclude_keywords` istege bagli
+- `exclude_keywords` isteğe bağlı
 
-`verification_code` alani ilk giris sirasinda gecici olarak kullanilacak.
+`verification_code` alanı ilk giriş sırasında geçici olarak kullanılacak.
 
-## 5. Telegram API Bilgilerini Nereden Alacaksin
+## 5. Telegram API Bilgilerini Nereden Alacaksın
 
-1. Tarayicidan [my.telegram.org](https://my.telegram.org) sitesine gir.
-2. Telegram telefon numaranla giris yap.
-3. `API development tools` bolumune gir.
-4. Gerekirse yeni uygulama olustur.
-5. Su iki bilgiyi not al:
+1. Tarayıcıdan [my.telegram.org](https://my.telegram.org) sitesine gir.
+2. Telegram telefon numaranla giriş yap.
+3. `API development tools` bölümüne gir.
+4. Gerekirse yeni uygulama oluştur.
+5. Şu iki bilgiyi not al:
 
 - `api_id`
 - `api_hash`
 
-## 6. Pushover Bilgilerini Nereden Alacaksin
+## 6. Pushover Bilgilerini Nereden Alacaksın
 
-1. [pushover.net](https://pushover.net) hesabina gir.
-2. `Your User Key` degerini not al.
-3. `Create an Application/API Token` ile uygulama olustur.
-4. `API Token/Key` degerini not al.
+1. [pushover.net](https://pushover.net) hesabına gir.
+2. `Your User Key` değerini not al.
+3. `Create an Application/API Token` ile uygulama oluştur.
+4. `API Token/Key` değerini not al.
 
-Kullanacagin alanlar:
+Kullanacağın alanlar:
 
 - `pushover_user_key`
 - `pushover_api_token`
 
-## 7. Telefon Numarasi Formati
+## 7. Telefon Numarası Formatı
 
-`phone_number` alanina numarani su formatta yaz:
+`phone_number` alanına numaranı şu formatta yaz:
 
 ```text
 +905xxxxxxxxx
 ```
 
-## 8. Kanal Listesi Nasil Girilecek
+## 8. Kanal Listesi Nasıl Girilecek
 
-`channels` alanina her bir kanali ayri oge olarak ekle.
+`channels` alanına her bir kanalı ayrı öğe olarak ekle.
 
-Ornek:
+Örnek:
 
 ```text
 @yaniyocom
@@ -110,7 +110,7 @@ Ornek:
 @onual_firsat
 ```
 
-Su an kullandigin kanal listesi:
+Şu an kullandığın kanal listesi:
 
 - `@yaniyocom`
 - `@firsatz`
@@ -124,11 +124,11 @@ Su an kullandigin kanal listesi:
 - `@evEkonomi`
 - `@firsatavi`
 
-## 9. Keyword Listesi Nasil Girilecek
+## 9. Keyword Listesi Nasıl Girilecek
 
-`keywords` alanina takip etmek istedigin kelimeleri ekle.
+`keywords` alanına takip etmek istediğin kelimeleri ekle.
 
-Ornek:
+Örnek:
 
 ```text
 iphone 16
@@ -137,80 +137,84 @@ dyson
 ps5
 ```
 
-`exclude_keywords` alanina istemedigin eslesmeleri koyabilirsin.
+`exclude_keywords` alanına istemediğin eşleşmeleri koyabilirsin.
 
-Ornek:
+Örnek:
 
 ```text
-cekilis
+çekiliş
 yorum yap
 ```
 
-## 10. Ilk Telegram Girisi
+## 10. İlk Telegram Girişi
 
-1. Tum alanlari kaydet.
+1. Tüm alanları kaydet.
 2. Eklentiyi `Start` et.
-3. Log ekraninda Telegram girisi istendigini goreceksin.
-4. Telegram uygulamanda gelen giris kodunu kontrol et.
-5. Bu kodu `verification_code` alanina yaz.
+3. Log ekranında Telegram girişi istendiğini göreceksin.
+4. Telegram uygulamanda gelen giriş kodunu kontrol et.
+5. Bu kodu `verification_code` alanına yaz.
 6. `Save` de.
 7. Eklentiyi `Restart` et.
 
-Basarili olursa logda buna benzer satirlar gorursun:
+Başarılı olursa logda buna benzer satırlar görürsün:
 
 ```text
-Kod ile giris basarili.
-Giris yapildi: Nuri
-Kanal dinleme basladi.
+Kod ile giriş başarılı.
+Giriş yapıldı: Nuri
+Kanal dinleme başladı.
 ```
 
-## 11. Giris Sonrasi
+## 11. Giriş Sonrası
 
-Giris tamamlandiktan sonra:
+Giriş tamamlandıktan sonra:
 
-1. `verification_code` alanini bosalt.
+1. `verification_code` alanını boşalt.
 2. `Save` de.
 
-Bu alanin dolu kalmasi gerekmez.
+Bu alanın dolu kalması gerekmez.
 
-## 12. Kenar Cubugu Durum Ekrani
+## 12. Kenar Çubuğu Durum Ekranı
 
-Surum `1.1.0` ve sonrasinda add-on'un kendi durum ekrani vardir.
+Sürüm `2.0` ve sonrasında add-on'un kendi durum ekranı vardır.
 
-1. Add-on sayfasina gir.
-2. Add-on calisiyorsa `Start` durumda kalsin.
-3. `Show in sidebar` secenegini ac.
-4. Sol menude `Telegram Alert` gorunur.
-5. Bu ekranda calisma durumu, kanal sayisi, keyword sayisi, son kontrol, son bildirim, susturulan tekrarlar ve hata sayisi gorunur.
+1. Add-on sayfasına gir.
+2. Add-on çalışıyorsa `Start` durumda kalsın.
+3. `Show in sidebar` seçeneğini aç.
+4. Sol menüde `Telegram Alert` görünür.
+5. Bu ekranda çalışma durumu, kanal sayısı, keyword sayısı, son kontrol, son bildirim, susturulan tekrarlar ve hata sayısı görünür.
 
-Hata sayisi yalnizca son 24 saati kapsar. 24 saatten eski hata kayitlari otomatik temizlenir.
+Hata sayısı yalnızca son 24 saati kapsar. 24 saatten eski hata kayıtları otomatik temizlenir.
 
-## 13. Calistigini Nasil Anlarsin
+## 13. Çalıştığını Nasıl Anlarsın
 
-Log ekraninda buna benzer satirlar gorunmeli:
-
-```text
-Giris yapildi: Nuri
-Kanal sayisi: 11
-Keyword sayisi: 1
-Kanal dinleme basladi.
-```
-
-Bir eslesme geldiginde logda sunu gorursun:
+Log ekranında buna benzer satırlar görünmeli:
 
 ```text
-Bildirim gonderildi. Kanal: ... Keyword: ...
+Giriş yapıldı: Nuri
+Kanal sayısı: 11
+Keyword sayısı: 1
+Kanal dinleme başladı.
 ```
 
-## 14. Onemli Not
+Bir eşleşme geldiğinde logda şunu görürsün:
 
-Telegram oturum bilgisi ve gorulmus mesaj kaydi calisirken add-on'in kendi veri alaninda tutulur. Home Assistant'i tamamen yeniden kurarsan, cogu durumda Telegram girisini yeniden yapman gerekir.
+```text
+Bildirim gönderildi. Kanal: ... Keyword: ...
+```
 
-## 15. Hata Olursa Ilk Kontrol Listesi
+## 14. Versiyonlama
 
-1. `api_id` ve `api_hash` dogru mu?
-2. `phone_number` `+90` ile mi yazildi?
-3. `pushover_user_key` ve `pushover_api_token` dogru mu?
-4. `channels` listesi dogru mu?
-5. `keywords` bos mu?
-6. Log ekraninda `Kanal dinleme basladi.` satiri var mi?
+Bundan sonra sürümler `2.0`, `2.1`, `2.2` formatında ilerler.
+
+## 15. Önemli Not
+
+Telegram oturum bilgisi ve görülmüş mesaj kaydı çalışırken add-on'un kendi veri alanında tutulur. Home Assistant'ı tamamen yeniden kurarsan, çoğu durumda Telegram girişini yeniden yapman gerekir.
+
+## 16. Hata Olursa İlk Kontrol Listesi
+
+1. `api_id` ve `api_hash` doğru mu?
+2. `phone_number` `+90` ile mi yazıldı?
+3. `pushover_user_key` ve `pushover_api_token` doğru mu?
+4. `channels` listesi doğru mu?
+5. `keywords` boş mu?
+6. Log ekranında `Kanal dinleme başladı.` satırı var mı?
