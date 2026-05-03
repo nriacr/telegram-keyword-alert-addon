@@ -70,7 +70,7 @@ def update_status(**values):
         status.update(values)
         save_json_file(STATUS_PATH, status)
     except Exception as error:
-        log(f"Durum dosyasi yazilamadi: {error}")
+        log(f"Durum dosyası yazılamadı: {error}")
 
 
 def prune_error_events(events):
@@ -176,7 +176,7 @@ def send_pushover(user_key, api_token, title, message, url=""):
 
     if url:
         payload["url"] = url
-        payload["url_title"] = "Telegram'da ac"
+        payload["url_title"] = "Telegram'da aç"
 
     response = requests.post(
         "https://api.pushover.net/1/messages.json",
@@ -509,7 +509,7 @@ async def main():
         state = load_json_file(STATE_PATH, {})
 
         if not verification_code:
-            log("Telegram girisi gerekiyor. Telefona bir kod gelecek.")
+            log("Telegram girişi gerekiyor. Telefona bir kod gelecek.")
             result = await client.send_code_request(phone_number)
             state["phone_code_hash"] = result.phone_code_hash
             save_json_file(STATE_PATH, state)
@@ -532,7 +532,7 @@ async def main():
                 code=verification_code,
                 phone_code_hash=phone_code_hash,
             )
-            log("Kod ile giris basarili.")
+            log("Kod ile giriş başarılı.")
         except SessionPasswordNeededError:
             log("İki adımlı doğrulama şifresi gerekiyor. Bunu sonraki adımda ekleyeceğiz.")
             record_error("İki adımlı doğrulama şifresi gerekiyor.")
@@ -622,7 +622,7 @@ async def main():
             if len(short_text) > 300:
                 short_text = short_text[:300] + "..."
 
-            title = f"Firsat alarmi: {matched_keyword}"
+            title = f"Fırsat alarmı: {matched_keyword}"
             body = f"Kanal: {channel_name}\n\n{short_text}"
 
             send_pushover(
@@ -641,8 +641,8 @@ async def main():
             )
             log(f"Bildirim gönderildi. Kanal: {channel_name} Keyword: {matched_keyword} Fiyat: {price or 'yok'}")
         except Exception as error:
-            log(f"Mesaj isleme hatasi: {error}")
-            record_error(f"Mesaj isleme hatasi: {error}")
+            log(f"Mesaj işleme hatası: {error}")
+            record_error(f"Mesaj işleme hatası: {error}")
 
     log("Kanal dinleme başladı.")
     update_status(status="Çalışıyor", last_check=now_text(), error_count_24h=get_error_count_24h())
