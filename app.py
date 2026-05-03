@@ -51,7 +51,7 @@ def save_json_file(path, data):
 
 def get_default_status():
     return {
-        "status": "Baslatiliyor",
+        "status": "Başlatılıyor",
         "channels_count": 0,
         "keywords_count": 0,
         "notifications_sent": 0,
@@ -85,7 +85,7 @@ def record_error(message):
         save_json_file(ERROR_EVENTS_PATH, events)
         update_status(error_count_24h=len(events), last_error=str(message))
     except Exception as error:
-        log(f"Hata kaydi yazilamadi: {error}")
+        log(f"Hata kaydı yazılamadı: {error}")
 
 
 def get_error_count_24h():
@@ -105,7 +105,7 @@ async def heartbeat_loop():
     while True:
         await asyncio.sleep(HEARTBEAT_INTERVAL_SECONDS)
         log("Kanal dinleme devam ediyor.")
-        update_status(status="Calisiyor", last_check=now_text(), error_count_24h=get_error_count_24h())
+        update_status(status="Çalışıyor", last_check=now_text(), error_count_24h=get_error_count_24h())
 
 
 def normalize_text(value):
@@ -192,19 +192,19 @@ def render_dashboard():
     status["error_count_24h"] = get_error_count_24h()
 
     status_label = status.get("status") or "Bilinmiyor"
-    is_running = status_label.lower() == "calisiyor"
+    is_running = status_label.lower() == "çalışıyor"
     status_color = "#4ade80" if is_running else "#f59e0b"
     status_border = "#2f855a" if is_running else "#92400e"
 
     cards = [
         ("Durum", status_label, status_color, status_border),
-        ("Telegram kanallari", status.get("channels_count", 0), "#f8fafc", "#303030"),
-        ("Keyword sayisi", status.get("keywords_count", 0), "#f8fafc", "#303030"),
-        ("Gonderilen bildirim", status.get("notifications_sent", 0), "#f8fafc", "#303030"),
+        ("Telegram kanalları", status.get("channels_count", 0), "#f8fafc", "#303030"),
+        ("Keyword sayısı", status.get("keywords_count", 0), "#f8fafc", "#303030"),
+        ("Gönderilen bildirim", status.get("notifications_sent", 0), "#f8fafc", "#303030"),
         ("Susturulan tekrar", status.get("duplicates_suppressed", 0), "#f8fafc", "#303030"),
         ("Son kontrol", status.get("last_check") or "-", "#f8fafc", "#303030"),
         ("Son bildirim", status.get("last_notification") or "-", "#f8fafc", "#303030"),
-        ("Hata sayisi", status.get("error_count_24h", 0), "#f8fafc", "#303030"),
+        ("Hata sayısı", status.get("error_count_24h", 0), "#f8fafc", "#303030"),
     ]
 
     card_html = "\n".join(
@@ -217,7 +217,7 @@ def render_dashboard():
         for label, value, color, border in cards
     )
 
-    last_error = escape(status.get("last_error") or "Son 24 saatte kayitli hata yok.")
+    last_error = escape(status.get("last_error") or "Son 24 saatte kayıtlı hata yok.")
 
     return f"""<!doctype html>
 <html lang="tr">
@@ -229,7 +229,7 @@ def render_dashboard():
   <style>
     :root {{
       color-scheme: dark;
-      --bg: #111111;
+      --bg: #101010;
       --panel: #191919;
       --card: #151515;
       --line: #303030;
@@ -248,30 +248,30 @@ def render_dashboard():
     }}
     main {{
       min-height: 100vh;
-      padding: clamp(18px, 4vw, 48px);
+      padding: clamp(16px, 3vw, 40px);
       background:
         radial-gradient(circle at top left, rgba(34, 158, 217, .16), transparent 32rem),
         linear-gradient(135deg, #181818 0%, #111111 54%, #16120e 100%);
     }}
     .shell {{
-      max-width: 1180px;
+      max-width: 1220px;
       margin: 0 auto;
       border: 1px solid var(--line);
       border-radius: 28px;
       background: rgba(25, 25, 25, .88);
-      padding: clamp(22px, 4vw, 34px);
+      padding: clamp(22px, 3.1vw, 34px);
       box-shadow: 0 24px 80px rgba(0, 0, 0, .34);
     }}
     .badge {{
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      padding: 12px 22px;
+      padding: 11px 22px;
       border-radius: 999px;
       background: linear-gradient(135deg, #ff9f0a, #ffb340);
       color: #111;
       font-weight: 800;
-      font-size: clamp(18px, 2.1vw, 24px);
+      font-size: clamp(17px, 1.5vw, 22px);
     }}
     .badge span {{
       width: 11px;
@@ -281,15 +281,15 @@ def render_dashboard():
       box-shadow: 0 0 0 4px rgba(34, 158, 217, .24);
     }}
     h1 {{
-      margin: 42px 0 18px;
-      font-size: clamp(42px, 7vw, 72px);
-      line-height: .96;
+      margin: 34px 0 16px;
+      font-size: clamp(38px, 4.1vw, 56px);
+      line-height: 1.02;
       letter-spacing: 0;
     }}
     .lead {{
-      margin: 0 0 30px;
+      margin: 0 0 28px;
       color: var(--muted);
-      font-size: clamp(19px, 2.2vw, 28px);
+      font-size: clamp(17px, 1.45vw, 22px);
       line-height: 1.35;
     }}
     .actions {{
@@ -302,14 +302,17 @@ def render_dashboard():
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 54px;
-      padding: 0 22px;
+      min-height: 52px;
+      padding: 0 20px;
       border-radius: 18px;
       border: 1px solid var(--line);
+      background: transparent;
       color: var(--text);
       text-decoration: none;
       font-weight: 800;
-      font-size: 20px;
+      font-size: 19px;
+      font-family: inherit;
+      cursor: pointer;
     }}
     .button.primary {{
       background: linear-gradient(135deg, #ff9f0a, #ffc04d);
@@ -322,19 +325,19 @@ def render_dashboard():
       gap: 16px;
     }}
     .card {{
-      min-height: 132px;
+      min-height: 126px;
       border: 1px solid var(--line);
       border-radius: 22px;
-      padding: 22px;
+      padding: 20px 22px;
       background: rgba(18, 18, 18, .84);
     }}
     .label {{
       color: var(--muted);
-      font-size: 18px;
-      margin-bottom: 18px;
+      font-size: 16px;
+      margin-bottom: 16px;
     }}
     .value {{
-      font-size: clamp(28px, 4vw, 42px);
+      font-size: clamp(26px, 2.5vw, 32px);
       line-height: 1.05;
       font-weight: 900;
       overflow-wrap: anywhere;
@@ -346,13 +349,13 @@ def render_dashboard():
       background: var(--accent-soft);
       padding: 20px 22px;
       color: #d4d4d8;
-      font-size: 20px;
+      font-size: 19px;
       line-height: 1.45;
     }}
     .foot {{
       margin-top: 22px;
       color: var(--muted);
-      font-size: 17px;
+      font-size: 16px;
     }}
     @media (max-width: 980px) {{
       .grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
@@ -369,18 +372,39 @@ def render_dashboard():
 <body>
   <main>
     <div class="shell">
-      <div class="badge"><span></span> Telegram firsat alarmi</div>
+      <div class="badge"><span></span> Telegram fırsat alarmı</div>
       <h1>Telegram Keyword Alert</h1>
-      <p class="lead">Bu sayfa Home Assistant kenar cubugu icin kisa durum ekranidir. Telegram kanal dinleme arka planda devam eder.</p>
+      <p class="lead">Bu sayfa Home Assistant kenar çubuğu için kısa durum ekranıdır. Telegram kanal dinleme arka planda devam eder.</p>
       <div class="actions">
-        <a class="button primary" href="/hassio/addon/telegram_keyword_alert/logs" target="_top">Kayitlari Ac</a>
-        <a class="button" href="/hassio/addon/telegram_keyword_alert/info" target="_top">Add-on Sayfasini Ac</a>
+        <button class="button primary" type="button" onclick="openAddonPage('logs')">Kayıtları Aç</button>
+        <button class="button" type="button" onclick="openAddonPage('info')">Add-on Sayfasını Aç</button>
       </div>
       <div class="grid">{card_html}</div>
-      <div class="note">Hata sayisi yalnizca son 24 saati kapsar. 24 saatten eski hata kayitlari otomatik silinir.<br>Son hata: {last_error}</div>
+      <div class="note">Hata sayısı yalnızca son 24 saati kapsar. 24 saatten eski hata kayıtları otomatik silinir.<br>Son hata: {last_error}</div>
       <div class="foot">Sayfa 60 saniyede bir otomatik yenilenir.</div>
     </div>
   </main>
+  <script>
+    function getAddonId() {{
+      const paths = [
+        window.top.location.pathname,
+        window.location.pathname
+      ];
+
+      for (const path of paths) {{
+        const firstSegment = path.split("/").filter(Boolean)[0] || "";
+        if (firstSegment.includes("telegram_keyword_alert")) {{
+          return firstSegment;
+        }}
+      }}
+
+      return "telegram_keyword_alert";
+    }}
+
+    function openAddonPage(page) {{
+      window.top.location.href = `/hassio/addon/${{getAddonId()}}/${{page}}`;
+    }}
+  </script>
 </body>
 </html>"""
 
@@ -427,27 +451,27 @@ async def handle_dashboard_client(reader, writer):
 async def start_dashboard_server():
     try:
         server = await asyncio.start_server(handle_dashboard_client, "0.0.0.0", DASHBOARD_PORT)
-        log(f"Sidebar arayuzu {DASHBOARD_PORT} portunda basladi.")
+        log(f"Sidebar arayüzü {DASHBOARD_PORT} portunda başladı.")
         async with server:
             await server.serve_forever()
     except Exception as error:
-        log(f"Sidebar arayuzu baslatilamadi: {error}")
-        record_error(f"Sidebar arayuzu baslatilamadi: {error}")
+        log(f"Sidebar arayüzü başlatılamadı: {error}")
+        record_error(f"Sidebar arayüzü başlatılamadı: {error}")
 
 
 async def main():
-    log("Telegram Keyword Alert add-on basladi.")
-    update_status(status="Baslatiliyor", last_check=now_text(), error_count_24h=get_error_count_24h())
+    log("Telegram Keyword Alert add-on başladı.")
+    update_status(status="Başlatılıyor", last_check=now_text(), error_count_24h=get_error_count_24h())
     asyncio.create_task(start_dashboard_server())
 
     try:
         config = load_config()
-        log("Yapilandirma dosyasi okundu.")
+        log("Yapılandırma dosyası okundu.")
     except Exception as error:
-        log(f"Yapilandirma okunamadi: {error}")
-        record_error(f"Yapilandirma okunamadi: {error}")
+        log(f"Yapılandırma okunamadı: {error}")
+        record_error(f"Yapılandırma okunamadı: {error}")
         update_status(status="Hata", last_check=now_text())
-        await wait_forever("Yapilandirma duzeltmesi bekleniyor...")
+        await wait_forever("Yapılandırma düzeltmesi bekleniyor...")
         return
 
     api_id = config.get("api_id")
@@ -466,17 +490,17 @@ async def main():
         log("api_id, api_hash veya phone_number eksik.")
         record_error("api_id, api_hash veya phone_number eksik.")
         update_status(status="Hata", last_check=now_text())
-        await wait_forever("Eksik ayar tamamlanmasi bekleniyor...")
+        await wait_forever("Eksik ayarın tamamlanması bekleniyor...")
         return
 
     if not pushover_user_key or not pushover_api_token:
-        log("Pushover ayarlari eksik.")
-        record_error("Pushover ayarlari eksik.")
+        log("Pushover ayarları eksik.")
+        record_error("Pushover ayarları eksik.")
         update_status(status="Hata", last_check=now_text())
-        await wait_forever("Pushover ayarlari bekleniyor...")
+        await wait_forever("Pushover ayarları bekleniyor...")
         return
 
-    log("Telegram baglantisi baslatiliyor...")
+    log("Telegram bağlantısı başlatılıyor...")
 
     client = TelegramClient(SESSION_PATH, int(api_id), api_hash)
     await client.connect()
@@ -489,17 +513,17 @@ async def main():
             result = await client.send_code_request(phone_number)
             state["phone_code_hash"] = result.phone_code_hash
             save_json_file(STATE_PATH, state)
-            log("Kod gonderildi. Home Assistant ayarlarinda verification_code alanina kodu yaz.")
-            update_status(status="Giris bekleniyor", last_check=now_text())
-            await wait_forever("Dogrulama kodu bekleniyor...")
+            log("Kod gönderildi. Home Assistant ayarlarında verification_code alanına kodu yaz.")
+            update_status(status="Giriş bekleniyor", last_check=now_text())
+            await wait_forever("Doğrulama kodu bekleniyor...")
             return
 
         phone_code_hash = state.get("phone_code_hash")
         if not phone_code_hash:
-            log("phone_code_hash bulunamadi. verification_code alanini bosaltip tekrar kod isteyelim.")
-            record_error("phone_code_hash bulunamadi.")
+            log("phone_code_hash bulunamadı. verification_code alanını boşaltıp tekrar kod isteyelim.")
+            record_error("phone_code_hash bulunamadı.")
             update_status(status="Hata", last_check=now_text())
-            await wait_forever("Dogrulama bilgisi bekleniyor...")
+            await wait_forever("Doğrulama bilgisi bekleniyor...")
             return
 
         try:
@@ -510,34 +534,34 @@ async def main():
             )
             log("Kod ile giris basarili.")
         except SessionPasswordNeededError:
-            log("Iki adimli dogrulama sifresi gerekiyor. Bunu sonraki adimda ekleyecegiz.")
-            record_error("Iki adimli dogrulama sifresi gerekiyor.")
+            log("İki adımlı doğrulama şifresi gerekiyor. Bunu sonraki adımda ekleyeceğiz.")
+            record_error("İki adımlı doğrulama şifresi gerekiyor.")
             update_status(status="Hata", last_check=now_text())
-            await wait_forever("2FA sifresi bekleniyor...")
+            await wait_forever("2FA şifresi bekleniyor...")
             return
         except Exception as error:
-            log(f"Giris hatasi: {error}")
-            record_error(f"Giris hatasi: {error}")
+            log(f"Giriş hatası: {error}")
+            record_error(f"Giriş hatası: {error}")
             update_status(status="Hata", last_check=now_text())
-            await wait_forever("Giris duzeltmesi bekleniyor...")
+            await wait_forever("Giriş düzeltmesi bekleniyor...")
             return
 
     me = await client.get_me()
-    log(f"Giris yapildi: {me.first_name}")
-    log(f"Kanal sayisi: {len(channels)}")
-    log(f"Keyword sayisi: {len(keywords)}")
-    update_status(status="Calisiyor", channels_count=len(channels), keywords_count=len(keywords), last_check=now_text())
+    log(f"Giriş yapıldı: {me.first_name}")
+    log(f"Kanal sayısı: {len(channels)}")
+    log(f"Keyword sayısı: {len(keywords)}")
+    update_status(status="Çalışıyor", channels_count=len(channels), keywords_count=len(keywords), last_check=now_text())
 
     if not channels:
-        log("Izlenecek kanal yok.")
-        record_error("Izlenecek kanal yok.")
+        log("İzlenecek kanal yok.")
+        record_error("İzlenecek kanal yok.")
         update_status(status="Hata", last_check=now_text())
         await wait_forever("Kanal listesi bekleniyor...")
         return
 
     if not keywords:
-        log("Keyword listesi bos.")
-        record_error("Keyword listesi bos.")
+        log("Keyword listesi boş.")
+        record_error("Keyword listesi boş.")
         update_status(status="Hata", last_check=now_text())
         await wait_forever("Keyword listesi bekleniyor...")
         return
@@ -551,7 +575,7 @@ async def main():
     @client.on(events.NewMessage(chats=channels))
     async def handle_new_message(event):
         try:
-            update_status(status="Calisiyor", last_check=now_text(), error_count_24h=get_error_count_24h())
+            update_status(status="Çalışıyor", last_check=now_text(), error_count_24h=get_error_count_24h())
             message_text = event.raw_text or ""
             matched, matched_keyword = message_matches(
                 message_text,
@@ -572,7 +596,7 @@ async def main():
                     return
 
                 if deal_key and seen_deals.get(deal_key) == current_day:
-                    log(f"Ayni gun icinde ayni fiyatli firsat susturuldu. Keyword: {matched_keyword} Fiyat: {price}")
+                    log(f"Aynı gün içinde aynı fiyatlı fırsat susturuldu. Keyword: {matched_keyword} Fiyat: {price}")
                     seen_messages.add(message_key)
                     save_json_file(SEEN_PATH, list(seen_messages))
                     status = load_json_file(STATUS_PATH, {})
@@ -615,13 +639,13 @@ async def main():
                 last_notification=now_text(),
                 last_check=now_text(),
             )
-            log(f"Bildirim gonderildi. Kanal: {channel_name} Keyword: {matched_keyword} Fiyat: {price or 'yok'}")
+            log(f"Bildirim gönderildi. Kanal: {channel_name} Keyword: {matched_keyword} Fiyat: {price or 'yok'}")
         except Exception as error:
             log(f"Mesaj isleme hatasi: {error}")
             record_error(f"Mesaj isleme hatasi: {error}")
 
-    log("Kanal dinleme basladi.")
-    update_status(status="Calisiyor", last_check=now_text(), error_count_24h=get_error_count_24h())
+    log("Kanal dinleme başladı.")
+    update_status(status="Çalışıyor", last_check=now_text(), error_count_24h=get_error_count_24h())
     asyncio.create_task(heartbeat_loop())
     await client.run_until_disconnected()
 
