@@ -248,69 +248,69 @@ def render_dashboard():
     }}
     main {{
       min-height: 100vh;
-      padding: clamp(16px, 3vw, 40px);
+      padding: clamp(12px, 1.8vw, 24px);
       background:
         radial-gradient(circle at top left, rgba(34, 158, 217, .16), transparent 32rem),
         linear-gradient(135deg, #181818 0%, #111111 54%, #16120e 100%);
     }}
     .shell {{
-      max-width: 1220px;
+      max-width: 980px;
       margin: 0 auto;
       border: 1px solid var(--line);
-      border-radius: 28px;
+      border-radius: 24px;
       background: rgba(25, 25, 25, .88);
-      padding: clamp(22px, 3.1vw, 34px);
+      padding: clamp(18px, 2vw, 24px);
       box-shadow: 0 24px 80px rgba(0, 0, 0, .34);
     }}
     .badge {{
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      padding: 11px 22px;
+      gap: 8px;
+      padding: 7px 15px;
       border-radius: 999px;
       background: linear-gradient(135deg, #ff9f0a, #ffb340);
       color: #111;
       font-weight: 800;
-      font-size: clamp(17px, 1.5vw, 22px);
+      font-size: 13px;
     }}
     .badge span {{
-      width: 11px;
-      height: 11px;
+      width: 8px;
+      height: 8px;
       border-radius: 999px;
       background: var(--blue);
       box-shadow: 0 0 0 4px rgba(34, 158, 217, .24);
     }}
     h1 {{
-      margin: 34px 0 16px;
-      font-size: clamp(38px, 4.1vw, 56px);
-      line-height: 1.02;
+      margin: 22px 0 10px;
+      font-size: clamp(24px, 2.4vw, 32px);
+      line-height: 1.08;
       letter-spacing: 0;
     }}
     .lead {{
-      margin: 0 0 28px;
+      margin: 0 0 20px;
       color: var(--muted);
-      font-size: clamp(17px, 1.45vw, 22px);
+      font-size: 14px;
       line-height: 1.35;
     }}
     .actions {{
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 30px;
+      gap: 10px;
+      margin-bottom: 20px;
     }}
     .button {{
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 52px;
-      padding: 0 20px;
-      border-radius: 18px;
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: 12px;
       border: 1px solid var(--line);
       background: transparent;
       color: var(--text);
       text-decoration: none;
       font-weight: 800;
-      font-size: 19px;
+      font-size: 13px;
       font-family: inherit;
       cursor: pointer;
     }}
@@ -322,49 +322,49 @@ def render_dashboard():
     .grid {{
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 16px;
+      gap: 12px;
     }}
     .card {{
-      min-height: 126px;
+      min-height: 86px;
       border: 1px solid var(--line);
-      border-radius: 22px;
-      padding: 20px 22px;
+      border-radius: 16px;
+      padding: 14px 16px;
       background: rgba(18, 18, 18, .84);
     }}
     .label {{
       color: var(--muted);
-      font-size: 16px;
-      margin-bottom: 16px;
+      font-size: 12px;
+      margin-bottom: 9px;
     }}
     .value {{
-      font-size: clamp(26px, 2.5vw, 32px);
+      font-size: clamp(18px, 1.6vw, 21px);
       line-height: 1.05;
       font-weight: 900;
       overflow-wrap: anywhere;
     }}
     .note {{
-      margin-top: 24px;
+      margin-top: 18px;
       border-left: 6px solid var(--accent);
-      border-radius: 16px;
+      border-radius: 12px;
       background: var(--accent-soft);
-      padding: 20px 22px;
+      padding: 12px 16px;
       color: #d4d4d8;
-      font-size: 19px;
+      font-size: 13px;
       line-height: 1.45;
     }}
     .foot {{
-      margin-top: 22px;
+      margin-top: 16px;
       color: var(--muted);
-      font-size: 16px;
+      font-size: 12px;
     }}
     @media (max-width: 980px) {{
       .grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
     }}
     @media (max-width: 620px) {{
       main {{ padding: 12px; }}
-      .shell {{ border-radius: 20px; padding: 18px; }}
+      .shell {{ border-radius: 18px; padding: 16px; }}
       .grid {{ grid-template-columns: 1fr; }}
-      h1 {{ margin-top: 28px; }}
+      h1 {{ margin-top: 20px; }}
       .button {{ width: 100%; }}
     }}
   </style>
