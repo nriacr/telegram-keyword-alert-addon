@@ -173,7 +173,19 @@ Giris tamamlandiktan sonra:
 
 Bu alanin dolu kalmasi gerekmez.
 
-## 12. Calistigini Nasil Anlarsin
+## 12. Kenar Cubugu Durum Ekrani
+
+Surum `1.1.0` ve sonrasinda add-on'un kendi durum ekrani vardir.
+
+1. Add-on sayfasina gir.
+2. Add-on calisiyorsa `Start` durumda kalsin.
+3. `Show in sidebar` secenegini ac.
+4. Sol menude `Telegram Alert` gorunur.
+5. Bu ekranda calisma durumu, kanal sayisi, keyword sayisi, son kontrol, son bildirim, susturulan tekrarlar ve hata sayisi gorunur.
+
+Hata sayisi yalnizca son 24 saati kapsar. 24 saatten eski hata kayitlari otomatik temizlenir.
+
+## 13. Calistigini Nasil Anlarsin
 
 Log ekraninda buna benzer satirlar gorunmeli:
 
@@ -190,11 +202,11 @@ Bir eslesme geldiginde logda sunu gorursun:
 Bildirim gonderildi. Kanal: ... Keyword: ...
 ```
 
-## 13. Onemli Not
+## 14. Onemli Not
 
 Telegram oturum bilgisi ve gorulmus mesaj kaydi calisirken add-on'in kendi veri alaninda tutulur. Home Assistant'i tamamen yeniden kurarsan, cogu durumda Telegram girisini yeniden yapman gerekir.
 
-## 14. Hata Olursa Ilk Kontrol Listesi
+## 15. Hata Olursa Ilk Kontrol Listesi
 
 1. `api_id` ve `api_hash` dogru mu?
 2. `phone_number` `+90` ile mi yazildi?
