@@ -2,7 +2,9 @@ import asyncio
 import json
 import os
 import re
+import time
 from datetime import datetime
+from html import escape
 
 import requests
 from telethon import TelegramClient, events
@@ -13,13 +15,21 @@ SESSION_PATH = "/data/telegram_keyword_alert"
 STATE_PATH = "/data/login_state.json"
 SEEN_PATH = "/data/seen_messages.json"
 SEEN_DEALS_PATH = "/data/seen_deals.json"
+STATUS_PATH = "/data/status.json"
+ERROR_EVENTS_PATH = "/data/error_events.json"
 PRICE_REGEX = re.compile(r"((?:\d{1,3}(?:[.,]\d{3})+|\d+)(?:[.,]\d{1,2})?)\s*(?:TL|₺)", re.IGNORECASE)
 HEARTBEAT_INTERVAL_SECONDS = 3600
+DASHBOARD_PORT = 8099
+ERROR_RETENTION_SECONDS = 24 * 60 * 60
+ALLOWED_DASHBOARD_CLIENTS = {"172.30.32.2", "127.0.0.1", "::1"}
+
+
+def now_text():
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 def log(message):
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"[{timestamp}] {message}")
+    print(f"[{now_text()}] {message}")
 
 
 def load_config():
@@ -39,9 +49,55 @@ def save_json_file(path, data):
         json.dump(data, file)
 
 
+def get_default_status():
+    return {
+        "status": "Baslatiliyor",
+        "channels_count": 0,
+        "keywords_count": 0,
+        "notifications_sent": 0,
+        "duplicates_suppressed": 0,
+        "last_check": "",
+        "last_notification": "",
+        "last_error": "",
+        "error_count_24h": 0,
+    }
+
+
+def update_status(**values):
+    try:
+        status = get_default_status()
+        status.update(load_json_file(STATUS_PATH, {}))
+        status.update(values)
+        save_json_file(STATUS_PATH, status)
+    except Exception as error:
+        log(f"Durum dosyasi yazilamadi: {error}")
+
+
+def prune_error_events(events):
+    cutoff = time.time() - ERROR_RETENTION_SECONDS
+    return [event for event in events if event.get("time", 0) >= cutoff]
+
+
+def record_error(message):
+    try:
+        events = prune_error_events(load_json_file(ERROR_EVENTS_PATH, []))
+        events.append({"time": time.time(), "message": str(message), "created_at": now_text()})
+        save_json_file(ERROR_EVENTS_PATH, events)
+        update_status(error_count_24h=len(events), last_error=str(message))
+    except Exception as error:
+        log(f"Hata kaydi yazilamadi: {error}")
+
+
+def get_error_count_24h():
+    events = prune_error_events(load_json_file(ERROR_EVENTS_PATH, []))
+    save_json_file(ERROR_EVENTS_PATH, events)
+    return len(events)
+
+
 async def wait_forever(message):
     while True:
         log(message)
+        update_status(last_check=now_text(), error_count_24h=get_error_count_24h())
         await asyncio.sleep(60)
 
 
@@ -49,6 +105,7 @@ async def heartbeat_loop():
     while True:
         await asyncio.sleep(HEARTBEAT_INTERVAL_SECONDS)
         log("Kanal dinleme devam ediyor.")
+        update_status(status="Calisiyor", last_check=now_text(), error_count_24h=get_error_count_24h())
 
 
 def normalize_text(value):
@@ -129,14 +186,267 @@ def send_pushover(user_key, api_token, title, message, url=""):
     response.raise_for_status()
 
 
+def render_dashboard():
+    status = get_default_status()
+    status.update(load_json_file(STATUS_PATH, {}))
+    status["error_count_24h"] = get_error_count_24h()
+
+    status_label = status.get("status") or "Bilinmiyor"
+    is_running = status_label.lower() == "calisiyor"
+    status_color = "#4ade80" if is_running else "#f59e0b"
+    status_border = "#2f855a" if is_running else "#92400e"
+
+    cards = [
+        ("Durum", status_label, status_color, status_border),
+        ("Telegram kanallari", status.get("channels_count", 0), "#f8fafc", "#303030"),
+        ("Keyword sayisi", status.get("keywords_count", 0), "#f8fafc", "#303030"),
+        ("Gonderilen bildirim", status.get("notifications_sent", 0), "#f8fafc", "#303030"),
+        ("Susturulan tekrar", status.get("duplicates_suppressed", 0), "#f8fafc", "#303030"),
+        ("Son kontrol", status.get("last_check") or "-", "#f8fafc", "#303030"),
+        ("Son bildirim", status.get("last_notification") or "-", "#f8fafc", "#303030"),
+        ("Hata sayisi", status.get("error_count_24h", 0), "#f8fafc", "#303030"),
+    ]
+
+    card_html = "\n".join(
+        f"""
+        <section class="card" style="border-color:{border}">
+          <div class="label">{escape(str(label))}</div>
+          <div class="value" style="color:{color}">{escape(str(value))}</div>
+        </section>
+        """
+        for label, value, color, border in cards
+    )
+
+    last_error = escape(status.get("last_error") or "Son 24 saatte kayitli hata yok.")
+
+    return f"""<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="refresh" content="60">
+  <title>Telegram Keyword Alert</title>
+  <style>
+    :root {{
+      color-scheme: dark;
+      --bg: #111111;
+      --panel: #191919;
+      --card: #151515;
+      --line: #303030;
+      --text: #f4f4f5;
+      --muted: #b7b7bb;
+      --accent: #ff9f0a;
+      --accent-soft: #3a2a1c;
+      --blue: #229ed9;
+    }}
+    * {{ box-sizing: border-box; }}
+    body {{
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }}
+    main {{
+      min-height: 100vh;
+      padding: clamp(18px, 4vw, 48px);
+      background:
+        radial-gradient(circle at top left, rgba(34, 158, 217, .16), transparent 32rem),
+        linear-gradient(135deg, #181818 0%, #111111 54%, #16120e 100%);
+    }}
+    .shell {{
+      max-width: 1180px;
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: rgba(25, 25, 25, .88);
+      padding: clamp(22px, 4vw, 34px);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, .34);
+    }}
+    .badge {{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 22px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ff9f0a, #ffb340);
+      color: #111;
+      font-weight: 800;
+      font-size: clamp(18px, 2.1vw, 24px);
+    }}
+    .badge span {{
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      background: var(--blue);
+      box-shadow: 0 0 0 4px rgba(34, 158, 217, .24);
+    }}
+    h1 {{
+      margin: 42px 0 18px;
+      font-size: clamp(42px, 7vw, 72px);
+      line-height: .96;
+      letter-spacing: 0;
+    }}
+    .lead {{
+      margin: 0 0 30px;
+      color: var(--muted);
+      font-size: clamp(19px, 2.2vw, 28px);
+      line-height: 1.35;
+    }}
+    .actions {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 30px;
+    }}
+    .button {{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 54px;
+      padding: 0 22px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 20px;
+    }}
+    .button.primary {{
+      background: linear-gradient(135deg, #ff9f0a, #ffc04d);
+      color: #111;
+      border: none;
+    }}
+    .grid {{
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }}
+    .card {{
+      min-height: 132px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 22px;
+      background: rgba(18, 18, 18, .84);
+    }}
+    .label {{
+      color: var(--muted);
+      font-size: 18px;
+      margin-bottom: 18px;
+    }}
+    .value {{
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.05;
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }}
+    .note {{
+      margin-top: 24px;
+      border-left: 6px solid var(--accent);
+      border-radius: 16px;
+      background: var(--accent-soft);
+      padding: 20px 22px;
+      color: #d4d4d8;
+      font-size: 20px;
+      line-height: 1.45;
+    }}
+    .foot {{
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 17px;
+    }}
+    @media (max-width: 980px) {{
+      .grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+    }}
+    @media (max-width: 620px) {{
+      main {{ padding: 12px; }}
+      .shell {{ border-radius: 20px; padding: 18px; }}
+      .grid {{ grid-template-columns: 1fr; }}
+      h1 {{ margin-top: 28px; }}
+      .button {{ width: 100%; }}
+    }}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="shell">
+      <div class="badge"><span></span> Telegram firsat alarmi</div>
+      <h1>Telegram Keyword Alert</h1>
+      <p class="lead">Bu sayfa Home Assistant kenar cubugu icin kisa durum ekranidir. Telegram kanal dinleme arka planda devam eder.</p>
+      <div class="actions">
+        <a class="button primary" href="/hassio/addon/telegram_keyword_alert/logs" target="_top">Kayitlari Ac</a>
+        <a class="button" href="/hassio/addon/telegram_keyword_alert/info" target="_top">Add-on Sayfasini Ac</a>
+      </div>
+      <div class="grid">{card_html}</div>
+      <div class="note">Hata sayisi yalnizca son 24 saati kapsar. 24 saatten eski hata kayitlari otomatik silinir.<br>Son hata: {last_error}</div>
+      <div class="foot">Sayfa 60 saniyede bir otomatik yenilenir.</div>
+    </div>
+  </main>
+</body>
+</html>"""
+
+
+async def handle_dashboard_client(reader, writer):
+    try:
+        peer = writer.get_extra_info("peername")
+        peer_host = peer[0] if peer else ""
+        if peer_host not in ALLOWED_DASHBOARD_CLIENTS:
+            body = b"Forbidden"
+            header = (
+                "HTTP/1.1 403 Forbidden\r\n"
+                "Content-Type: text/plain; charset=utf-8\r\n"
+                f"Content-Length: {len(body)}\r\n"
+                "Connection: close\r\n\r\n"
+            ).encode("utf-8")
+            writer.write(header + body)
+            await writer.drain()
+            return
+
+        request = await reader.read(4096)
+        if not request:
+            writer.close()
+            await writer.wait_closed()
+            return
+
+        body = render_dashboard().encode("utf-8")
+        header = (
+            "HTTP/1.1 200 OK\r\n"
+            "Content-Type: text/html; charset=utf-8\r\n"
+            f"Content-Length: {len(body)}\r\n"
+            "Cache-Control: no-store\r\n"
+            "Connection: close\r\n\r\n"
+        ).encode("utf-8")
+        writer.write(header + body)
+        await writer.drain()
+    except Exception as error:
+        record_error(f"Dashboard hatasi: {error}")
+    finally:
+        writer.close()
+        await writer.wait_closed()
+
+
+async def start_dashboard_server():
+    try:
+        server = await asyncio.start_server(handle_dashboard_client, "0.0.0.0", DASHBOARD_PORT)
+        log(f"Sidebar arayuzu {DASHBOARD_PORT} portunda basladi.")
+        async with server:
+            await server.serve_forever()
+    except Exception as error:
+        log(f"Sidebar arayuzu baslatilamadi: {error}")
+        record_error(f"Sidebar arayuzu baslatilamadi: {error}")
+
+
 async def main():
     log("Telegram Keyword Alert add-on basladi.")
+    update_status(status="Baslatiliyor", last_check=now_text(), error_count_24h=get_error_count_24h())
+    asyncio.create_task(start_dashboard_server())
 
     try:
         config = load_config()
         log("Yapilandirma dosyasi okundu.")
     except Exception as error:
         log(f"Yapilandirma okunamadi: {error}")
+        record_error(f"Yapilandirma okunamadi: {error}")
+        update_status(status="Hata", last_check=now_text())
         await wait_forever("Yapilandirma duzeltmesi bekleniyor...")
         return
 
@@ -150,13 +460,19 @@ async def main():
     pushover_user_key = config.get("pushover_user_key", "").strip()
     pushover_api_token = config.get("pushover_api_token", "").strip()
 
+    update_status(channels_count=len(channels), keywords_count=len(keywords), last_check=now_text())
+
     if not api_id or not api_hash or not phone_number:
         log("api_id, api_hash veya phone_number eksik.")
+        record_error("api_id, api_hash veya phone_number eksik.")
+        update_status(status="Hata", last_check=now_text())
         await wait_forever("Eksik ayar tamamlanmasi bekleniyor...")
         return
 
     if not pushover_user_key or not pushover_api_token:
         log("Pushover ayarlari eksik.")
+        record_error("Pushover ayarlari eksik.")
+        update_status(status="Hata", last_check=now_text())
         await wait_forever("Pushover ayarlari bekleniyor...")
         return
 
@@ -174,12 +490,15 @@ async def main():
             state["phone_code_hash"] = result.phone_code_hash
             save_json_file(STATE_PATH, state)
             log("Kod gonderildi. Home Assistant ayarlarinda verification_code alanina kodu yaz.")
+            update_status(status="Giris bekleniyor", last_check=now_text())
             await wait_forever("Dogrulama kodu bekleniyor...")
             return
 
         phone_code_hash = state.get("phone_code_hash")
         if not phone_code_hash:
-            log("phone_code_hash bulunamadi. verification_code alanini bosaltip tekrar kod isteleyelim.")
+            log("phone_code_hash bulunamadi. verification_code alanini bosaltip tekrar kod isteyelim.")
+            record_error("phone_code_hash bulunamadi.")
+            update_status(status="Hata", last_check=now_text())
             await wait_forever("Dogrulama bilgisi bekleniyor...")
             return
 
@@ -192,10 +511,14 @@ async def main():
             log("Kod ile giris basarili.")
         except SessionPasswordNeededError:
             log("Iki adimli dogrulama sifresi gerekiyor. Bunu sonraki adimda ekleyecegiz.")
+            record_error("Iki adimli dogrulama sifresi gerekiyor.")
+            update_status(status="Hata", last_check=now_text())
             await wait_forever("2FA sifresi bekleniyor...")
             return
         except Exception as error:
             log(f"Giris hatasi: {error}")
+            record_error(f"Giris hatasi: {error}")
+            update_status(status="Hata", last_check=now_text())
             await wait_forever("Giris duzeltmesi bekleniyor...")
             return
 
@@ -203,25 +526,32 @@ async def main():
     log(f"Giris yapildi: {me.first_name}")
     log(f"Kanal sayisi: {len(channels)}")
     log(f"Keyword sayisi: {len(keywords)}")
+    update_status(status="Calisiyor", channels_count=len(channels), keywords_count=len(keywords), last_check=now_text())
 
     if not channels:
         log("Izlenecek kanal yok.")
+        record_error("Izlenecek kanal yok.")
+        update_status(status="Hata", last_check=now_text())
         await wait_forever("Kanal listesi bekleniyor...")
         return
 
     if not keywords:
         log("Keyword listesi bos.")
+        record_error("Keyword listesi bos.")
+        update_status(status="Hata", last_check=now_text())
         await wait_forever("Keyword listesi bekleniyor...")
         return
 
     seen_messages = set(load_json_file(SEEN_PATH, []))
     today_key = datetime.now().strftime("%Y-%m-%d")
     seen_deals = prune_seen_deals(load_json_file(SEEN_DEALS_PATH, {}), today_key)
+    seen_deals_lock = asyncio.Lock()
     save_json_file(SEEN_DEALS_PATH, seen_deals)
 
     @client.on(events.NewMessage(chats=channels))
     async def handle_new_message(event):
         try:
+            update_status(status="Calisiyor", last_check=now_text(), error_count_24h=get_error_count_24h())
             message_text = event.raw_text or ""
             matched, matched_keyword = message_matches(
                 message_text,
@@ -233,21 +563,28 @@ async def main():
                 return
 
             message_key = f"{event.chat_id}:{event.id}"
-            if message_key in seen_messages:
-                return
-
             price = extract_price(message_text)
             deal_key = build_daily_deal_key(matched_keyword, price)
             current_day = datetime.now().strftime("%Y-%m-%d")
 
-            if deal_key and seen_deals.get(deal_key) == current_day:
-                log(f"Ayni gun icinde ayni fiyatli firsat susturuldu. Keyword: {matched_keyword} Fiyat: {price}")
+            async with seen_deals_lock:
+                if message_key in seen_messages:
+                    return
+
+                if deal_key and seen_deals.get(deal_key) == current_day:
+                    log(f"Ayni gun icinde ayni fiyatli firsat susturuldu. Keyword: {matched_keyword} Fiyat: {price}")
+                    seen_messages.add(message_key)
+                    save_json_file(SEEN_PATH, list(seen_messages))
+                    status = load_json_file(STATUS_PATH, {})
+                    update_status(duplicates_suppressed=int(status.get("duplicates_suppressed", 0)) + 1)
+                    return
+
                 seen_messages.add(message_key)
                 save_json_file(SEEN_PATH, list(seen_messages))
-                return
 
-            seen_messages.add(message_key)
-            save_json_file(SEEN_PATH, list(seen_messages))
+                if deal_key:
+                    seen_deals[deal_key] = current_day
+                    save_json_file(SEEN_DEALS_PATH, seen_deals)
 
             chat = await event.get_chat()
             channel_name = getattr(chat, "title", None) or getattr(chat, "username", None) or "Telegram"
@@ -272,15 +609,19 @@ async def main():
                 message_link,
             )
 
-            if deal_key:
-                seen_deals[deal_key] = current_day
-                save_json_file(SEEN_DEALS_PATH, seen_deals)
-
+            status = load_json_file(STATUS_PATH, {})
+            update_status(
+                notifications_sent=int(status.get("notifications_sent", 0)) + 1,
+                last_notification=now_text(),
+                last_check=now_text(),
+            )
             log(f"Bildirim gonderildi. Kanal: {channel_name} Keyword: {matched_keyword} Fiyat: {price or 'yok'}")
         except Exception as error:
             log(f"Mesaj isleme hatasi: {error}")
+            record_error(f"Mesaj isleme hatasi: {error}")
 
     log("Kanal dinleme basladi.")
+    update_status(status="Calisiyor", last_check=now_text(), error_count_24h=get_error_count_24h())
     asyncio.create_task(heartbeat_loop())
     await client.run_until_disconnected()
 
