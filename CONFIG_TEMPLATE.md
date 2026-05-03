@@ -61,6 +61,13 @@ yorum yap
 7. Telegram'dan gelen kodu `verification_code` alanina gir.
 8. `Restart` et.
 9. Basarili giristen sonra `verification_code` alanini temizle.
+10. Istersen add-on sayfasinda `Show in sidebar` secenegini ac.
+
+## Kenar Cubugu
+
+`Show in sidebar` acildiginda sol menude `Telegram Alert` gorunur. Bu ekranda calisma durumu, kanal sayisi, keyword sayisi, son kontrol, bildirim sayisi, susturulan tekrarlar ve hata sayisi gorunur.
+
+Hata sayisi yalnizca son 24 saati kapsar. 24 saatten eski hata kayitlari otomatik temizlenir.
 
 ## GitHub Yerlesimi
 
