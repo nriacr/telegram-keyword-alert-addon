@@ -111,7 +111,7 @@ def get_addon_id():
             )
             response.raise_for_status()
             data = response.json().get("data", {})
-            slug = data.get("slug") or data.get("hostname") or ""
+            slug = data.get("hostname") or data.get("slug") or ""
             if slug:
                 ADDON_ID_CACHE = slug.replace("-", "_")
                 return ADDON_ID_CACHE
@@ -165,7 +165,7 @@ def normalize_price(value):
 
 
 def extract_price(text):
-    match = PRICE_REGEX.searchhtext or "")
+    match = PRICE_REGEX.search(text or "")
     if not match:
         return None
     return normalize_price(match.group(1))
@@ -422,7 +422,7 @@ def render_dashboard():
     const ADDON_ID = "{addon_id}";
 
     function openAddonPage(page) {{
-      window.top.location.href = `/hassio/addon/${{ADDON_ID}}/${{page}}`;
+      window.top.location.href = `/config/app/${{ADDON_ID}}/${{page}}`;
     }}
   </script>
 </body>
