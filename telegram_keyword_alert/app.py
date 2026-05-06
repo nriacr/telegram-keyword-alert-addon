@@ -22,6 +22,7 @@ HEARTBEAT_INTERVAL_SECONDS = 3600
 DASHBOARD_PORT = 8099
 ERROR_RETENTION_SECONDS = 24 * 60 * 60
 ALLOWED_DASHBOARD_CLIENTS = {"172.30.32.2", "127.0.0.1", "::1"}
+ADDON_ID_CACHE = ""
 
 
 def now_text():
@@ -94,6 +95,38 @@ def get_error_count_24h():
     return len(events)
 
 
+def get_addon_id():
+    global ADDON_ID_CACHE
+
+    if ADDON_ID_CACHE:
+        return ADDON_ID_CACHE
+
+    supervisor_token = os.environ.get("SUPERVISOR_TOKEN", "")
+    if supervisor_token:
+        try:
+            response = requests.get(
+                "http://supervisor/addons/self/info",
+                headers={"Authorization": f"Bearer {supervisor_token}"},
+                timeout=8,
+            )
+            response.raise_for_status()
+            data = response.json().get("data", {})
+            slug = data.get("slug") or data.get("hostname") or ""
+            if slug:
+                ADDON_ID_CACHE = slug.replace("-", "_")
+                return ADDON_ID_CACHE
+        except Exception as error:
+            log(f"Add-on kimliği Supervisor API'den okunamadı: {error}")
+
+    hostname = os.environ.get("HOSTNAME", "")
+    if "telegram" in hostname:
+        ADDON_ID_CACHE = hostname.replace("-", "_")
+        return ADDON_ID_CACHE
+
+    ADDON_ID_CACHE = "telegram_keyword_alert"
+    return ADDON_ID_CACHE
+
+
 async def wait_forever(message):
     while True:
         log(message)
@@ -132,7 +165,7 @@ def normalize_price(value):
 
 
 def extract_price(text):
-    match = PRICE_REGEX.search(text or "")
+    match = PRICE_REGEX.searchhtext or "")
     if not match:
         return None
     return normalize_price(match.group(1))
@@ -218,6 +251,7 @@ def render_dashboard():
     )
 
     last_error = escape(status.get("last_error") or "Son 24 saatte kayıtlı hata yok.")
+    addon_id = escape(get_addon_id())
 
     return f"""<!doctype html>
 <html lang="tr">
@@ -385,24 +419,10 @@ def render_dashboard():
     </div>
   </main>
   <script>
-    function getAddonId() {{
-      const paths = [
-        window.top.location.pathname,
-        window.location.pathname
-      ];
-
-      for (const path of paths) {{
-        const firstSegment = path.split("/").filter(Boolean)[0] || "";
-        if (firstSegment.includes("telegram_keyword_alert")) {{
-          return firstSegment;
-        }}
-      }}
-
-      return "telegram_keyword_alert";
-    }}
+    const ADDON_ID = "{addon_id}";
 
     function openAddonPage(page) {{
-      window.top.location.href = `/hassio/addon/${{getAddonId()}}/${{page}}`;
+      window.top.location.href = `/hassio/addon/${{ADDON_ID}}/${{page}}`;
     }}
   </script>
 </body>

@@ -1,6 +1,6 @@
 {
   "name": "Telegram Keyword Alert",
-  "version": "2.1",
+  "version": "2.2",
   "slug": "telegram_keyword_alert",
   "description": "Listens Telegram channels and sends Pushover alerts for matching keywords.",
   "startup": "services",
@@ -9,6 +9,7 @@
   "init": false,
   "ingress": true,
   "ingress_port": 8099,
+  "hassio_api": true,
   "panel_icon": "mdi:bell-badge",
   "panel_title": "Telegram Alert",
   "options": {
