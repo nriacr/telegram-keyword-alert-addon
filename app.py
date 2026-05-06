@@ -410,8 +410,8 @@ def render_dashboard():
       <h1>Telegram Keyword Alert</h1>
       <p class="lead">Bu sayfa Home Assistant kenar çubuğu için kısa durum ekranıdır. Telegram kanal dinleme arka planda devam eder.</p>
       <div class="actions">
-        <button class="button primary" type="button" onclick="openAddonPage('logs')">Kayıtları Aç</button>
-        <button class="button" type="button" onclick="openAddonPage('info')">Add-on Sayfasını Aç</button>
+        <button class="button primary" type="button" onclick="openAddonPage('logs')">LOG</button>
+        <button class="button" type="button" onclick="openAddonPage('config')">Config</button>
       </div>
       <div class="grid">{card_html}</div>
       <div class="note">Hata sayısı yalnızca son 24 saati kapsar. 24 saatten eski hata kayıtları otomatik silinir.<br>Son hata: {last_error}</div>
@@ -512,7 +512,7 @@ async def main():
         update_status(status="Hata", last_check=now_text())
         await wait_forever("Eksik ayarın tamamlanması bekleniyor...")
         return
-
+    
     if not pushover_user_key or not pushover_api_token:
         log("Pushover ayarları eksik.")
         record_error("Pushover ayarları eksik.")
@@ -537,7 +537,7 @@ async def main():
             update_status(status="Giriş bekleniyor", last_check=now_text())
             await wait_forever("Doğrulama kodu bekleniyor...")
             return
-
+    
         phone_code_hash = state.get("phone_code_hash")
         if not phone_code_hash:
             log("phone_code_hash bulunamadı. verification_code alanını boşaltıp tekrar kod isteyelim.")
@@ -545,7 +545,7 @@ async def main():
             update_status(status="Hata", last_check=now_text())
             await wait_forever("Doğrulama bilgisi bekleniyor...")
             return
-
+    
         try:
             await client.sign_in(
                 phone=phone_number,
@@ -565,7 +565,7 @@ async def main():
             update_status(status="Hata", last_check=now_text())
             await wait_forever("Giriş düzeltmesi bekleniyor...")
             return
-
+    
     me = await client.get_me()
     log(f"Giriş yapıldı: {me.first_name}")
     log(f"Kanal sayısı: {len(channels)}")
