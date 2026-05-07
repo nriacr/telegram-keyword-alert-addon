@@ -1,6 +1,6 @@
 {
   "name": "Telegram Keyword Alert",
-  "version": "2.7",
+  "version": "2.8",
   "slug": "telegram_keyword_alert",
   "description": "Listens Telegram channels and sends Pushover alerts for matching keywords.",
   "startup": "services",
